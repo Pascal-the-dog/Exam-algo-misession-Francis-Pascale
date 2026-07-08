@@ -41,3 +41,5 @@ build/
 .env
 
 /src/main/java/org/example/pokedex_francis_pascale/utils/Connexion.java
+
+pom.xml
