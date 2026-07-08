@@ -54,7 +54,7 @@ public class PokemonViewFX {
         btnCharger = new Button("Charger depuis API");
 
         messageErreur = new Label();
-//        messageErreur.setStyle("-fx-text-fill:red");
+        // messageErreur.setStyle("-fx-text-fill:red");
 
 
         HBox formulaire = new HBox(10, champId, btnCharger);
