@@ -3,26 +3,27 @@ package org.example.pokedex_francis_pascale.controller;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
-import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
+import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 
 public class PokemonMainController {
 
     private final PokemonDAO dao = new PokemonDAO();
     private final PokemonApiService service = new PokemonApiService();
-    private final PokemonViewFx view;
+    private final PokemonViewFX view;
 
-    public PokemonMainController(PokemonViewFx view) {
+    public PokemonMainController(PokemonViewFX view) {
         this.view = view;
-        view.btnCharger.setOnAction(e -> chargerDeputisApi());
+        view.btnCharger.setOnAction(e -> chargerDepuisApi());
         view.listePokemon.getSelectionModel().selectedItemProperty()
-                .addListener(());
+                .addListener((obs, ancien, nouveau) -> afficherPokemonDetails(nouveau) );
+
     }
 
-    public void chargerDeputisApi() {
-        String uuid = view.champUuid.getText();
+    public void chargerDepuisApi() {
+        String id = view.champId.getText();
         try {
-            Pokemon pokemon = service.recuperer.getText();
+            Pokemon pokemon = service.recuperer(id);
             dao.sauvegarder(pokemon);
             refreshList();
         } catch (Exception e) {
@@ -37,7 +38,7 @@ public class PokemonMainController {
             return;
         }
         String Message =
-               "Id : ( " + pokemon.id + ") " + pokemon.nom;
+                "Id : ( " + pokemon.id + ") " + pokemon.nom;
         if(pokemon.image_url !=null) {
             Image img = new Image(pokemon.image_url, true);
             view.imagePokemon.setImage(img);
@@ -48,7 +49,7 @@ public class PokemonMainController {
         try {
             view.listePokemon.getItems().setAll(dao.lister());
         } catch (Exception e) {
-            view.massageErreur.setText("Erreur dans la base de donnees" + e.getMessage());
+            view.messageErreur.setText("Erreur dans la base de donnees" + e.getMessage());
         }
     }
     public void demarrer(){

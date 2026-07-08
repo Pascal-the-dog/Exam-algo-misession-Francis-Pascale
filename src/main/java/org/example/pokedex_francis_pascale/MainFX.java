@@ -1,5 +1,5 @@
 package org.example.pokedex_francis_pascale;
-import org.example.pokedex_francis_pascale.controller.PokemonController;
+import org.example.pokedex_francis_pascale.controller.PokemonMainController;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.view.PokemonView;
 import javafx.application.Application;

@@ -8,7 +8,7 @@ import java.sql.*;
 
 
 public class PokemonDAO {
-    public void PokedexPokemonIdentification(Pokemon pokemon) throws SQLException {
+    public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
                 +"(id,nom,type,type2,hp,attack,attackSp,defense,defenseSp,vitesse, image_url) "
