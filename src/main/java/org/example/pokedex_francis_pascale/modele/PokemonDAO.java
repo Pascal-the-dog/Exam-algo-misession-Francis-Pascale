@@ -10,13 +10,23 @@ import java.sql.*;
 public class PokemonDAO {
     public void PokedexPokemonIdentification(Pokemon pokemon) throws SQLException {
         String sql =
-                "INSERT INTO pokemon"
-                +"(id,nom,type,type2,hp,attack,attackSp,defense,defenseSp,vitesse, image_url)"
-                +"VALUES(?,?,?,?,?,?,?,?,?,?,?)"
-                +"ON CONFLICT (id) DO UPDATE SET";
+                "INSERT INTO pokemon "
+                +"(id,nom,type,type2,hp,attack,attackSp,defense,defenseSp,vitesse, image_url) "
+                +"VALUES(?,?,?,?,?,?,?,?,?,?,?) "
+                +"ON CONFLICT (id) DO UPDATE SET " +
+                "nom = EXCLUDED.nom, " +
+                "type = EXCLUDED.type, " +
+                "type2 = EXCLUDED.type2, " +
+                "hp = EXCLUDED.hp, " +
+                "attack = EXCLUDED.attack, " +
+                "attackSp = EXCLUDED.attackSp, " +
+                "defense = EXCLUDED.defense, " +
+                "defenseSp = EXCLUDED.defenseSp, " +
+                "vitesse = EXCLUDED.vitesse, " +
+                "image_url = EXCLUDED.image_url";;
             
-        try(Connection conect = Connexion.getConnexion();
-            PreparedStatement pre = conect.prepareStatement(sql)){
+        try(Connection connect = Connexion.getConnexion();
+            PreparedStatement pre = connect.prepareStatement(sql)){
 
             pre.setInt(1, pokemon.id);
             pre.setString(2, pokemon.nom);
@@ -35,10 +45,10 @@ public class PokemonDAO {
     }
 
     public List<Pokemon> lister() throws SQLException {
-        String sql = "SELECT * FROM pokemon ORDERED BY id DESC";
+        String sql = "SELECT * FROM pokemon ORDER BY id DESC";
         List <Pokemon> tousEnsemble = new ArrayList<>();
-        try(Connection conect = Connexion.getConnexion();
-            Statement st = conect.createStatement();
+        try(Connection connect = Connexion.getConnexion();
+            Statement st = connect.createStatement();
             ResultSet rs = st.executeQuery(sql)) {
             
             while(rs.next()){
