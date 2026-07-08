@@ -2,7 +2,7 @@ package org.example.pokedex_francis_pascale;
 
 
 
-import org.example.pokedex_francis_pascale.controller.PokemonController;
+import org.example.pokedex_francis_pascale.controller.PokemonMainController;
 
 
 public class Main {

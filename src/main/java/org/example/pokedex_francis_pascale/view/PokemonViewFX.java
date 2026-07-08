@@ -18,7 +18,7 @@ public class PokemonViewFX {
 
     public final ListView<Pokemon> listePokemon;
     public final TextArea detail;
-    public final TextField champUuid;
+    public final TextField champId;
     public final Button btnCharger;
     public final Label messageErreur;
     public final ImageView imagePokemon;
@@ -47,9 +47,9 @@ public class PokemonViewFX {
 
 
         // Zone du bas
-        champUuid = new TextField();
-        champUuid.setPromptText("Donnez le UUID d'un film a partir de l'API");
-        HBox.setHgrow(champUuid, Priority.ALWAYS);
+        champId = new TextField();
+        champId.setPromptText("Donnez le UUID d'un film a partir de l'API");
+        HBox.setHgrow(champId, Priority.ALWAYS);
 
         btnCharger = new Button("Charger depuis API");
 
@@ -57,7 +57,7 @@ public class PokemonViewFX {
 //        messageErreur.setStyle("-fx-text-fill:red");
 
 
-        HBox formulaire = new HBox(10, champUuid, btnCharger);
+        HBox formulaire = new HBox(10, champId, btnCharger);
         VBox bas = new VBox(6, formulaire, messageErreur);
 
         //Assemblage
