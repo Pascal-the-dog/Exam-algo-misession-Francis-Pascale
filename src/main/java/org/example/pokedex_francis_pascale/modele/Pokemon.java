@@ -11,6 +11,7 @@ public class Pokemon {
     public int defense;
     public int defenseSp;
     public int vitesse;
+    public String imageUrl;
 
     public Pokemon(){}
 }
