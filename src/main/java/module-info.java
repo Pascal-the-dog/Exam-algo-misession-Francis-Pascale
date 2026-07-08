@@ -1,6 +1,6 @@
 module org.example.pokedex_francis_pascale {
     requires javafx.controls;
-    requires javafx.fxml;
+//    requires javafx.fxml;
     requires java.net.http;
 
 

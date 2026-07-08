@@ -13,12 +13,12 @@ public class MainFX extends Application {
     public void start(Stage stage) throws Exception {
         PokemonViewFX view = new PokemonViewFX();
 
-//        PokemonController ctrl = new PokemonController(view);
-//        ctrl.demarrer();
+        PokemonMainController ctrl = new PokemonMainController(view);
+        ctrl.demarrer();
 
         Scene scene = new Scene(view.getRoot(), 900, 500);
         scene.getStylesheets().add(
-                getClass().getResource("style.css").toExternalForm()
+                getClass().getResource("/styles.css").toExternalForm()
         );
         stage.setTitle("Mes Pokemons");
         stage.setScene(scene);
