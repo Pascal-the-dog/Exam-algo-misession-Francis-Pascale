@@ -37,13 +37,31 @@ public class PokemonMainController {
             view.imagePokemon.setImage(null);
             return;
         }
-        String Message =
-                "Id : ( " + pokemon.id + ") " + pokemon.nom;
-        if(pokemon.image_url !=null) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID : ").append(pokemon.id).append("\n");
+        sb.append("Nom : ").append(pokemon.nom).append("\n");
+        sb.append("Type : ").append(pokemon.type);
+        if (pokemon.type2 != null) {
+            sb.append(" / ").append(pokemon.type2);
+        }
+        sb.append("\n\n");
+
+        sb.append("HP : ").append(pokemon.hp).append("\n");
+        sb.append("Attaque : ").append(pokemon.attack).append("\n");
+        sb.append("Défense : ").append(pokemon.defense).append("\n");
+        sb.append("Attaque Spéciale : ").append(pokemon.attackSp).append("\n");
+        sb.append("Défense Spéciale : ").append(pokemon.defenseSp).append("\n");
+        sb.append("Vitesse : ").append(pokemon.vitesse).append("\n");
+
+        view.detail.setText(sb.toString());
+
+        if (pokemon.image_url != null) {
             Image img = new Image(pokemon.image_url, true);
             view.imagePokemon.setImage(img);
         }
     }
+
 
     public void refreshList() {
         try {

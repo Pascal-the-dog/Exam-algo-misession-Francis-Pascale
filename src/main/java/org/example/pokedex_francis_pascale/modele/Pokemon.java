@@ -14,4 +14,10 @@ public class Pokemon {
     public String image_url;
 
     public Pokemon(){}
+
+    @Override
+    public String toString() {
+        return nom + " (#" + id + ")";
+    }
+
 }
