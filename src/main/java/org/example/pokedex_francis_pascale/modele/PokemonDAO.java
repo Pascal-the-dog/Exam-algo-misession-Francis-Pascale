@@ -13,7 +13,7 @@ public class PokemonDAO {
                 "INSERT INTO pokemon"
                 +"(id,nom,type,type2,hp,attack,attackSp,defense,defenseSp,vitesse, image_url)"
                 +"VALUES(?,?,?,?,?,?,?,?,?,?,?)"
-                +"ON CONFLICT (id) DO UPDTAE SET";
+                +"ON CONFLICT (id) DO UPDATE SET";
             
         try(Connection conect = Connexion.getConnexion();
             PreparedStatement pre = conect.prepareStatement(sql)){
