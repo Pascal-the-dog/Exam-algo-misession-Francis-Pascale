@@ -34,7 +34,7 @@ public class PokemonApiService {
 
         JsonNode pokemon = mapper.readTree(res.body());
 
-        System.out.println(pokemon);
+
         // pokemon ? ===> JSON ===> Dictionnaire
         Pokemon p = new Pokemon();
 
