@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Connexion {
-    private static final String URL = "jdbc:postgresql://localhost:5432/ghiblidb";
+    private static final String URL = "jdbc:postgresql://localhost:5432/pokedexdb";
     private static final String USER = "postgres";
     private static final String PASS = "slcwsnbm";
 
