@@ -1,6 +1,6 @@
 package org.example.pokedex_francis_pascale.modele;
 
-import org.example.pokedex_francis_pascale.util.Connexion;
+import org.example.pokedex_francis_pascale.utils.Connexion;
 
 import java.util.ArrayList;
 import java.util.List;
