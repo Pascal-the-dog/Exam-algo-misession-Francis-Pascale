@@ -1,8 +1,7 @@
 DROP TABLE IF EXISTS pokemon ;
 
     CREATE TABLE pokemon (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    pokemon_id INT UNIQUE,
+    id INT PRIMARY KEY,
     nom VARCHAR (50) NOT NULL,
     type VARCHAR (100),
     type_2 VARCHAR (100),
