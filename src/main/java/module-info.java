@@ -5,6 +5,7 @@ module org.example.pokedex_francis_pascale {
 
 
     requires com.fasterxml.jackson.databind;
+    requires java.sql;
 
 
     opens org.example.pokedex_francis_pascale to javafx.fxml;
