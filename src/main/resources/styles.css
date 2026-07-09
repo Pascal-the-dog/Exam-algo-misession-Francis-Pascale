@@ -156,3 +156,44 @@
     -fx-background-color: linear-gradient(to right, #fca5a5, #ef4444);
     -fx-background-radius: 20;
 }
+
+/* Les 18 types de pokemon */
+
+.type-badge {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-padding: 3px 8px;
+    -fx-background-radius: 4px;
+    -fx-alignment: center;
+}
+
+.type-normal { -fx-background-color: #A8A77A; }
+.type-fire { -fx-background-color: #EE8130; }
+.type-water { -fx-background-color: #6390F0; }
+.type-electric { -fx-background-color: #F7D02C; -fx-text-fill: #333333; }
+.type-grass { -fx-background-color: #7AC74C; }
+.type-ice { -fx-background-color: #96D9D6; -fx-text-fill: #333333; }
+.type-fighting { -fx-background-color: #C22E28; }
+.type-poison { -fx-background-color: #A33EA1; }
+.type-ground { -fx-background-color: #E2BF65; }
+.type-flying { -fx-background-color: #A98FF3; }
+.type-psychic { -fx-background-color: #F95587; }
+.type-bug { -fx-background-color: #A6B91A; }
+.type-rock { -fx-background-color: #B6A136; }
+.type-ghost { -fx-background-color: #735797; }
+.type-dragon { -fx-background-color: #6F35FC; }
+.type-dark { -fx-background-color: #705746; }
+.type-steel { -fx-background-color: #B7B7CE; -fx-text-fill: #333333; }
+.type-fairy { -fx-background-color: #D685AD; }
+
+
+types-container-box {
+       -fx-padding: 4px 8px 4px 8px;
+       -fx-max-width: -fx-to-pref;
+       -fx-border-color: #dddddd;
+       -fx-border-width: 1px;
+       -fx-border-radius: 6px;
+       -fx-background-radius: 6px;
+       -fx-background-color: #fafafa;
+}

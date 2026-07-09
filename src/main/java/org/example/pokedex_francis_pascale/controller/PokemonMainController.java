@@ -1,5 +1,6 @@
 package org.example.pokedex_francis_pascale.controller;
 
+import javafx.scene.control.Label;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
@@ -63,7 +64,7 @@ public class PokemonMainController {
             view.bouttonCapturer.setDisable(true);
             view.champRecherche.clear();
         } catch (Exception e) {
-            view.messageErreur.setText("Erreur lors de la capture du pokemon : " + e.getMessage());
+            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
         }
     }
 
@@ -73,12 +74,22 @@ public class PokemonMainController {
             return;
         }
 
-        StringBuilder titre = new StringBuilder();
-        titre.append("#").append(pokemon.id).append(" ").append(pokemon.nom).append(" - ").append(pokemon.type);
-        if (pokemon.type2 != null && !pokemon.type2.isEmpty()) {
-            titre.append(" / ").append(pokemon.type2);
+        view.conteneurTypes.getChildren().clear();
+        view.lblPokemonIdNom.setText("#" + pokemon.id + " " + pokemon.nom);
+
+        Label premierType = new Label(pokemon.type.toUpperCase());
+        premierType.getStyleClass().addAll("type-badge", "type-" + pokemon.type.toLowerCase().trim());
+        view.conteneurTypes.getChildren().add(premierType);
+
+        if (pokemon.type2 != null && !pokemon.type2.trim().isEmpty()) {
+            Label deuxiemeType = new Label(pokemon.type2.toUpperCase());
+            deuxiemeType.getStyleClass().addAll("type-badge", "type-" + pokemon.type2.toLowerCase().trim());
+            view.conteneurTypes.getChildren().add(deuxiemeType);
+            view.conteneurTypes.setVisible(true);
+            view.conteneurTypes.setManaged(true);
+        } else {
+            view.conteneurTypes.getStyleClass().add("types-container-box");
         }
-        view.lblPokemonIdNom.setText(titre.toString());
 
         view.valleurHp.setText(String.valueOf(pokemon.hp));
         view.valleurAttack.setText(String.valueOf(pokemon.attack));
