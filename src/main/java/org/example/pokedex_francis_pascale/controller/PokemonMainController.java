@@ -30,7 +30,7 @@ public class PokemonMainController {
 
         try {
             Pokemon pokemon = service.recuperer(recherche.trim());
-            dao.PokedexPokemonIdentification(pokemon);
+            dao.sauvegarder(pokemon);
             refreshList();
 
             view.listePokemon.getSelectionModel().select(pokemon);
