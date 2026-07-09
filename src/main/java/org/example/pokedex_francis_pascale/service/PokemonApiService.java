@@ -2,6 +2,7 @@ package org.example.pokedex_francis_pascale.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 
 import java.net.URI;
@@ -22,7 +23,7 @@ public class PokemonApiService {
         int code = res.statusCode();
 
         if(code == 404){
-            throw new RuntimeException("Pokemon introuvable");
+            throw new PokemonIntrouvableException();
         }
         if(code == 500){
             throw new RuntimeException("Erreur interne de l'API");
