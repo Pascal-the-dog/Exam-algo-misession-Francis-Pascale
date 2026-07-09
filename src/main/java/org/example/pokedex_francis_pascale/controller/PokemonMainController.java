@@ -3,8 +3,8 @@ package org.example.pokedex_francis_pascale.controller;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
-import javafx.scene.image.Image;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
+import javafx.scene.image.Image;
 
 public class PokemonMainController {
 
@@ -14,63 +14,95 @@ public class PokemonMainController {
 
     public PokemonMainController(PokemonViewFX view) {
         this.view = view;
-        view.btnCharger.setOnAction(e -> chargerDepuisApi());
+        view.bouttonRecherche.setOnAction(e -> chargerDepuisApi());
         view.listePokemon.getSelectionModel().selectedItemProperty()
-                .addListener((obs, ancien, nouveau) -> afficherPokemonDetails(nouveau) );
-
+                .addListener((obs, ancien, nouveau) -> afficherPokemonDetails(nouveau));
     }
 
     public void chargerDepuisApi() {
-        String id = view.champId.getText();
+        String recherche = view.champRecherche.getText();
+        view.messageErreur.setText("");
+
+        if (recherche == null || recherche.trim().isEmpty()) {
+            view.messageErreur.setText("Veuillez entrer un ID ou un nom.");
+            return;
+        }
+
         try {
-            Pokemon pokemon = service.recuperer(id);
-            dao.sauvegarder(pokemon);
+            Pokemon pokemon = service.recuperer(recherche.trim());
+            dao.PokedexPokemonIdentification(pokemon);
             refreshList();
+
+            view.listePokemon.getSelectionModel().select(pokemon);
         } catch (Exception e) {
-            view.messageErreur.setText("Pokemon Introuvable ou erreur d'API : " + e.getMessage());
+            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
         }
     }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
         if (pokemon == null) {
-            view.detail.clear();
-            view.imagePokemon.setImage(null);
+            clearPokemonDetails();
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("ID : ").append(pokemon.id).append("\n");
-        sb.append("Nom : ").append(pokemon.nom).append("\n");
-        sb.append("Type : ").append(pokemon.type);
-        if (pokemon.type2 != null) {
-            sb.append(" / ").append(pokemon.type2);
+        StringBuilder titre = new StringBuilder();
+        titre.append("#").append(pokemon.id).append(" ").append(pokemon.nom).append(" - ").append(pokemon.type);
+        if (pokemon.type2 != null && !pokemon.type2.isEmpty()) {
+            titre.append(" / ").append(pokemon.type2);
         }
-        sb.append("\n\n");
+        view.lblPokemonIdNom.setText(titre.toString());
 
-        sb.append("HP : ").append(pokemon.hp).append("\n");
-        sb.append("Attaque : ").append(pokemon.attack).append("\n");
-        sb.append("Défense : ").append(pokemon.defense).append("\n");
-        sb.append("Attaque Spéciale : ").append(pokemon.attackSp).append("\n");
-        sb.append("Défense Spéciale : ").append(pokemon.defenseSp).append("\n");
-        sb.append("Vitesse : ").append(pokemon.vitesse).append("\n");
+        view.valleurHp.setText(String.valueOf(pokemon.hp));
+        view.valleurAttack.setText(String.valueOf(pokemon.attack));
+        view.valleurAttackSp.setText(String.valueOf(pokemon.attackSp));
+        view.valleurDefense.setText(String.valueOf(pokemon.defense));
+        view.valleurDefenseSp.setText(String.valueOf(pokemon.defenseSp));
+        view.valleurVitesse.setText(String.valueOf(pokemon.vitesse));
 
-        view.detail.setText(sb.toString());
+        view.barHp.setProgress(pokemon.hp / 255.0);
+        view.barAttack.setProgress(pokemon.attack / 255.0);
+        view.barAttackSp.setProgress(pokemon.attackSp / 255.0);
+        view.barDefense.setProgress(pokemon.defense / 255.0);
+        view.barDefenseSp.setProgress(pokemon.defenseSp / 255.0);
+        view.barVitesse.setProgress(pokemon.vitesse / 255.0);
 
-        if (pokemon.image_url != null) {
+        if (pokemon.image_url != null && !pokemon.image_url.isEmpty()) {
             Image img = new Image(pokemon.image_url, true);
             view.imagePokemon.setImage(img);
+        } else {
+            view.imagePokemon.setImage(null);
         }
     }
 
+    private void clearPokemonDetails() {
+        view.lblPokemonIdNom.setText("Aucun Pokémon Sélectionné");
+
+        view.valleurHp.setText("-");
+        view.valleurAttack.setText("-");
+        view.valleurAttackSp.setText("-");
+        view.valleurDefense.setText("-");
+        view.valleurDefenseSp.setText("-");
+        view.valleurVitesse.setText("-");
+
+        view.barHp.setProgress(0.0);
+        view.barAttack.setProgress(0.0);
+        view.barAttackSp.setProgress(0.0);
+        view.barDefense.setProgress(0.0);
+        view.barDefenseSp.setProgress(0.0);
+        view.barVitesse.setProgress(0.0);
+
+        view.imagePokemon.setImage(null);
+    }
 
     public void refreshList() {
         try {
             view.listePokemon.getItems().setAll(dao.lister());
         } catch (Exception e) {
-            view.messageErreur.setText("Erreur dans la base de donnees" + e.getMessage());
+            view.messageErreur.setText("Erreur dans la base de données : " + e.getMessage());
         }
     }
-    public void demarrer(){
+
+    public void demarrer() {
         refreshList();
     }
 }

@@ -11,22 +11,22 @@ public class PokemonDAO {
     public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
-                +"(id,nom,type,type_2,hp,attaque,attaque_speciale,defense,defense_speciale,vitesse,image_url) "
-                +"VALUES(?,?,?,?,?,?,?,?,?,?,?) "
-                +"ON CONFLICT (id) DO UPDATE SET " +
-                "nom = EXCLUDED.nom, " +
-                "type = EXCLUDED.type, " +
-                "type_2 = EXCLUDED.type_2, " +
-                "hp = EXCLUDED.hp, " +
-                "attaque = EXCLUDED.attaque, " +
-                "attaque_speciale = EXCLUDED.attaque_speciale, " +
-                "defense = EXCLUDED.defense, " +
-                "defense_speciale = EXCLUDED.defense_speciale, " +
-                "vitesse = EXCLUDED.vitesse, " +
-                "image_url = EXCLUDED.image_url";;
-            
-        try(Connection connect = Connexion.getConnexion();
-            PreparedStatement pre = connect.prepareStatement(sql)){
+                        + "(id, nom, type, type2, hp, attack, attackSp, defense, defenseSp, vitesse, image_url) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                        + "ON CONFLICT (id) DO UPDATE SET "
+                        + "nom = EXCLUDED.nom, "
+                        + "type = EXCLUDED.type, "
+                        + "type2 = EXCLUDED.type2, "
+                        + "hp = EXCLUDED.hp, "
+                        + "attack = EXCLUDED.attack, "
+                        + "attackSp = EXCLUDED.attackSp, "
+                        + "defense = EXCLUDED.defense, "
+                        + "defenseSp = EXCLUDED.defenseSp, "
+                        + "vitesse = EXCLUDED.vitesse, "
+                        + "image_url = EXCLUDED.image_url";
+
+        try(Connection conect = Connexion.getConnexion();
+            PreparedStatement pre = conect.prepareStatement(sql)){
 
             pre.setInt(1, pokemon.id);
             pre.setString(2, pokemon.nom);
@@ -50,7 +50,7 @@ public class PokemonDAO {
         try(Connection connect = Connexion.getConnexion();
             Statement st = connect.createStatement();
             ResultSet rs = st.executeQuery(sql)) {
-            
+
             while(rs.next()){
                 Pokemon pokemon = new Pokemon();
                 pokemon.id = rs.getInt("id");
