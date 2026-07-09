@@ -21,6 +21,7 @@ public class PokemonViewFX {
     public final ImageView imagePokemon;
     public final ListView<Pokemon> listePokemon;
     public final Label messageErreur;
+    public final HBox conteneurTypes;
 
     private final BorderPane racine;
 
@@ -86,6 +87,11 @@ public class PokemonViewFX {
         lblPokemonIdNom = new Label("Aucun Pokemon Selectioner");
         lblPokemonIdNom.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
+        conteneurTypes = new HBox(6);
+        conteneurTypes.setAlignment(Pos.CENTER_LEFT);
+        conteneurTypes.setMaxWidth(Region.USE_PREF_SIZE);
+        conteneurTypes.getStyleClass().add("types-container-box");
+
         Label lblStatsTitre = new Label("Statistiques");
         lblStatsTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
         GridPane PanneauStats = new GridPane();
@@ -115,7 +121,12 @@ public class PokemonViewFX {
         PanneauStats.setVgap(10);
         PanneauStats.setAlignment(Pos.CENTER_LEFT);
 
-        VBox PanneauInfoCentral = new VBox(12, lblPokemonIdNom, lblStatsTitre, PanneauStats);
+        HBox ligneIdentite = new HBox(10);
+        ligneIdentite.setAlignment(Pos.CENTER_LEFT);
+        Region spacerIdentite = new Region();
+        HBox.setHgrow(spacerIdentite, Priority.ALWAYS);
+        ligneIdentite.getChildren().addAll(lblPokemonIdNom, spacerIdentite, conteneurTypes);
+        VBox PanneauInfoCentral = new VBox(12, ligneIdentite, lblStatsTitre, PanneauStats);
         PanneauInfoCentral.setPadding(new Insets(0, 15, 0, 15));
 
         // Section de pokemon sauvegarder dans la base de donnee
@@ -123,6 +134,17 @@ public class PokemonViewFX {
         Label lblListeTitre = new Label("List de vos pokemon");
         lblListeTitre.setStyle("-fx-font-weight: bold;");
         listePokemon = new ListView<>();
+        listePokemon.setCellFactory(lv -> new ListCell<Pokemon>() {
+            @Override
+            protected void updateItem(Pokemon item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText("#" + item.id + " - " + item.nom);
+                }
+            }
+        });
         VBox.setVgrow(listePokemon, Priority.ALWAYS);
         PanneauListe.getChildren().addAll(lblListeTitre, listePokemon);
         PanneauListe.setPrefWidth(250);
@@ -163,4 +185,4 @@ public class PokemonViewFX {
 }
 
 
-// TODO: Ajouter un bouton ajouter pour ajouter un pokemon qui n'est pas dans la liste
+// TODO: Ajouter un bouton pour relacher un pokemon dans la liste en dessous de cette liste
