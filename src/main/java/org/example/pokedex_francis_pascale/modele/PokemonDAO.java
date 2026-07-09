@@ -11,17 +11,17 @@ public class PokemonDAO {
     public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
-                +"(id,nom,type,type_2,hp,attaque,attaque_speciale,defense,defense_speciale,vitesse,image_url) "
+                +"(id,nom,type,type2,hp,attack,attackSp,defense,defenseSp,vitesse,image_url) "
                 +"VALUES(?,?,?,?,?,?,?,?,?,?,?) "
                 +"ON CONFLICT (id) DO UPDATE SET " +
                 "nom = EXCLUDED.nom, " +
                 "type = EXCLUDED.type, " +
-                "type_2 = EXCLUDED.type_2, " +
+                "type2 = EXCLUDED.type2, " +
                 "hp = EXCLUDED.hp, " +
-                "attaque = EXCLUDED.attaque, " +
-                "attaque_speciale = EXCLUDED.attaque_speciale, " +
+                "attack = EXCLUDED.attack, " +
+                "attackSp = EXCLUDED.attackSp, " +
                 "defense = EXCLUDED.defense, " +
-                "defense_speciale = EXCLUDED.defense_speciale, " +
+                "defenseSp = EXCLUDED.defenseSp, " +
                 "vitesse = EXCLUDED.vitesse, " +
                 "image_url = EXCLUDED.image_url";;
             
@@ -56,12 +56,12 @@ public class PokemonDAO {
                 pokemon.id = rs.getInt("id");
                 pokemon.nom = rs.getString("nom");
                 pokemon.type = rs.getString("type");
-                pokemon.type2 = rs.getString("type_2");
+                pokemon.type2 = rs.getString("type2");
                 pokemon.hp = rs.getInt("hp");
-                pokemon.attack = rs.getInt("attaque");
-                pokemon.attackSp = rs.getInt("attaque_speciale");
+                pokemon.attack = rs.getInt("attack");
+                pokemon.attackSp = rs.getInt("attackSp");
                 pokemon.defense = rs.getInt("defense");
-                pokemon.defenseSp = rs.getInt("defense_speciale");
+                pokemon.defenseSp = rs.getInt("defenseSp");
                 pokemon.vitesse = rs.getInt("vitesse");
                 pokemon.image_url = rs.getString("image_url");
                 tousEnsemble.add(pokemon);
