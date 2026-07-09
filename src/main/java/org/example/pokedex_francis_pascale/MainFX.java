@@ -1,4 +1,5 @@
 package org.example.pokedex_francis_pascale;
+import org.example.pokedex_francis_pascale.controller.PokemonMainController;
 
 import org.example.pokedex_francis_pascale.controller.PokemonMainController;
 import javafx.application.Application;
@@ -28,3 +29,5 @@ public class MainFX extends Application {
         launch(args);
     }
 }
+
+

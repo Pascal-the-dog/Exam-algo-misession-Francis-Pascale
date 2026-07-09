@@ -15,17 +15,26 @@ public class PokemonApiService {
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public Pokemon recuperer(String id) throws Exception{
-        HttpRequest req = HttpRequest.newBuilder(URI.create(URL+id)).GET().build();
+    public Pokemon recuperer(String search) throws Exception{
+        HttpRequest req = HttpRequest.newBuilder(URI.create(URL+search.toLowerCase())).GET().build();
         HttpResponse<String> res = client.send(req,HttpResponse.BodyHandlers.ofString());
 
-        if(res.statusCode() != 200){
-            throw new RuntimeException("API erreur");
+        int code = res.statusCode();
+
+        if(code == 404){
+            throw new RuntimeException("Pokemon introuvable");
         }
+        if(code == 500){
+            throw new RuntimeException("Erreur interne de l'API");
+        }
+        if(code != 200){
+            throw new RuntimeException("API erreur : " + code);
+        }
+
 
         JsonNode pokemon = mapper.readTree(res.body());
 
-        System.out.println(pokemon);
+
         // pokemon ? ===> JSON ===> Dictionnaire
         Pokemon p = new Pokemon();
 

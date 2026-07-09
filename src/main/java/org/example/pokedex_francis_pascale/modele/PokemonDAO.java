@@ -8,7 +8,7 @@ import java.sql.*;
 
 
 public class PokemonDAO {
-    public void PokedexPokemonIdentification(Pokemon pokemon) throws SQLException {
+    public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
                         + "(id, nom, type, type2, hp, attack, attackSp, defense, defenseSp, vitesse, image_url) "
@@ -47,8 +47,8 @@ public class PokemonDAO {
     public List<Pokemon> lister() throws SQLException {
         String sql = "SELECT * FROM pokemon ORDER BY id DESC";
         List <Pokemon> tousEnsemble = new ArrayList<>();
-        try(Connection conect = Connexion.getConnexion();
-            Statement st = conect.createStatement();
+        try(Connection connect = Connexion.getConnexion();
+            Statement st = connect.createStatement();
             ResultSet rs = st.executeQuery(sql)) {
 
             while(rs.next()){
@@ -56,12 +56,12 @@ public class PokemonDAO {
                 pokemon.id = rs.getInt("id");
                 pokemon.nom = rs.getString("nom");
                 pokemon.type = rs.getString("type");
-                pokemon.type2 = rs.getString("type2");
+                pokemon.type2 = rs.getString("type_2");
                 pokemon.hp = rs.getInt("hp");
-                pokemon.attack = rs.getInt("attack");
-                pokemon.attackSp = rs.getInt("attackSp");
+                pokemon.attack = rs.getInt("attaque");
+                pokemon.attackSp = rs.getInt("attaque_speciale");
                 pokemon.defense = rs.getInt("defense");
-                pokemon.defenseSp = rs.getInt("defenseSp");
+                pokemon.defenseSp = rs.getInt("defense_speciale");
                 pokemon.vitesse = rs.getInt("vitesse");
                 pokemon.image_url = rs.getString("image_url");
                 tousEnsemble.add(pokemon);
