@@ -29,6 +29,8 @@ public class PokemonMainController {
         } catch (Exception e) {
             view.messageErreur.setText("Pokemon Introuvable ou erreur d'API : " + e.getMessage());
         }
+
+
     }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
