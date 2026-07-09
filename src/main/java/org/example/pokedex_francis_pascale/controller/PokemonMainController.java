@@ -1,10 +1,14 @@
 package org.example.pokedex_francis_pascale.controller;
 
+import javafx.application.Platform;
+import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
+
+
 
 public class PokemonMainController {
 
@@ -28,18 +32,31 @@ public class PokemonMainController {
             return;
         }
 
-        try {
-            Pokemon pokemon = service.recuperer(recherche.trim());
-            dao.sauvegarder(pokemon);
-            refreshList();
+        new Thread(() -> {
+            try {
+                Pokemon pokemon = service.recuperer(recherche.trim());
+                dao.sauvegarder(pokemon);
 
-            view.listePokemon.getSelectionModel().select(pokemon);
-        } catch (Exception e) {
-            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
-        }
+                Platform.runLater(() -> {
+                    refreshList();
+                    view.listePokemon.getSelectionModel().select(pokemon);
+                });
+            }
+            catch (PokemonIntrouvableException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur 404: " + e.getMessage());
+                });
 
+           }
+            catch (Exception e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("erreur d'API : " + e.getMessage());
+                });
+            }
 
+        }).start();
     }
+
 
     public void afficherPokemonDetails(Pokemon pokemon) {
         if (pokemon == null) {
