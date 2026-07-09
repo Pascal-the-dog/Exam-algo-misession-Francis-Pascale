@@ -46,7 +46,7 @@ public class PokemonApiService {
         p.defenseSp = stats.get(4).get("base_stat").asInt();
         p.vitesse = stats.get(5).get("base_stat").asInt();
 
-        p.imageUrl = pokemon.get("sprites").get("front_default").asText();
+        p.image_url = pokemon.get("sprites").get("front_default").asText();
 
         return p;
     }

@@ -1,6 +1,6 @@
 package org.example.pokedex_francis_pascale.modele;
 
-import org.example.pokedex_francis_pascale.util.Connexion;
+import org.example.pokedex_francis_pascale.utils.Connexion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +10,21 @@ import java.sql.*;
 public class PokemonDAO {
     public void PokedexPokemonIdentification(Pokemon pokemon) throws SQLException {
         String sql =
-                "INSERT INTO pokemon"
-                +"(id,nom,type,type2,hp,attack,attackSp,defense,defenseSp,vitesse, image_url)"
-                +"VALUES(?,?,?,?,?,?,?,?,?,?,?)"
-                +"ON CONFLICT (id) DO UPDTAE SET";
-            
+                "INSERT INTO pokemon "
+                        + "(id, nom, type, type2, hp, attack, attackSp, defense, defenseSp, vitesse, image_url) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                        + "ON CONFLICT (id) DO UPDATE SET "
+                        + "nom = EXCLUDED.nom, "
+                        + "type = EXCLUDED.type, "
+                        + "type2 = EXCLUDED.type2, "
+                        + "hp = EXCLUDED.hp, "
+                        + "attack = EXCLUDED.attack, "
+                        + "attackSp = EXCLUDED.attackSp, "
+                        + "defense = EXCLUDED.defense, "
+                        + "defenseSp = EXCLUDED.defenseSp, "
+                        + "vitesse = EXCLUDED.vitesse, "
+                        + "image_url = EXCLUDED.image_url";
+
         try(Connection conect = Connexion.getConnexion();
             PreparedStatement pre = conect.prepareStatement(sql)){
 
@@ -35,12 +45,12 @@ public class PokemonDAO {
     }
 
     public List<Pokemon> lister() throws SQLException {
-        String sql = "SELECT * FROM pokemon ORDERED BY id DESC";
+        String sql = "SELECT * FROM pokemon ORDER BY id DESC";
         List <Pokemon> tousEnsemble = new ArrayList<>();
         try(Connection conect = Connexion.getConnexion();
             Statement st = conect.createStatement();
             ResultSet rs = st.executeQuery(sql)) {
-            
+
             while(rs.next()){
                 Pokemon pokemon = new Pokemon();
                 pokemon.id = rs.getInt("id");
