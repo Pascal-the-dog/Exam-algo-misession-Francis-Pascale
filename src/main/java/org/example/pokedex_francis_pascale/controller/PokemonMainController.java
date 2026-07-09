@@ -1,14 +1,10 @@
 package org.example.pokedex_francis_pascale.controller;
 
-import javafx.application.Platform;
-import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
-
-
 
 public class PokemonMainController {
 
@@ -16,47 +12,60 @@ public class PokemonMainController {
     private final PokemonApiService service = new PokemonApiService();
     private final PokemonViewFX view;
 
+    private Pokemon pokemonTrouverListe = null;
+
     public PokemonMainController(PokemonViewFX view) {
         this.view = view;
         view.bouttonRecherche.setOnAction(e -> chargerDepuisApi());
+        view.bouttonCapturer.setOnAction(e -> capturerPokemon());
         view.listePokemon.getSelectionModel().selectedItemProperty()
-                .addListener((obs, ancien, nouveau) -> afficherPokemonDetails(nouveau));
+                .addListener((obs, ancien, nouveau) -> {
+                    afficherPokemonDetails(nouveau);
+                    if (nouveau != null) {
+                        view.bouttonCapturer.setDisable(true);
+                    }
+                });
     }
 
     public void chargerDepuisApi() {
         String recherche = view.champRecherche.getText();
         view.messageErreur.setText("");
+        pokemonTrouverListe = null;
+        view.bouttonCapturer.setDisable(true);
 
         if (recherche == null || recherche.trim().isEmpty()) {
             view.messageErreur.setText("Veuillez entrer un ID ou un nom.");
             return;
         }
 
-        new Thread(() -> {
-            try {
-                Pokemon pokemon = service.recuperer(recherche.trim());
-                dao.sauvegarder(pokemon);
+        try {
+            Pokemon pokemon = service.recuperer(recherche.trim());
+            pokemonTrouverListe = pokemon;
+            afficherPokemonDetails(pokemon);
+            view.bouttonCapturer.setDisable(false);
+            // dao.sauvegarder(pokemon);
+            // refreshList();
 
-                Platform.runLater(() -> {
-                    refreshList();
-                    view.listePokemon.getSelectionModel().select(pokemon);
-                });
-            }
-            catch (PokemonIntrouvableException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur 404: " + e.getMessage());
-                });
-
-           }
-            catch (Exception e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("erreur d'API : " + e.getMessage());
-                });
-            }
-
-        }).start();
+            // view.listePokemon.getSelectionModel().select(pokemon);
+        } catch (Exception e) {
+            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
+            clearPokemonDetails();
+        }
     }
-
+    public void capturerPokemon() {
+        if (pokemonTrouverListe == null) {
+            return;
+        }
+        try {
+            dao.sauvegarder(pokemonTrouverListe);
+            refreshList();
+            view.listePokemon.getSelectionModel().select(pokemonTrouverListe);
+            view.bouttonCapturer.setDisable(true);
+            view.champRecherche.clear();
+        } catch (Exception e) {
+            view.messageErreur.setText("Erreur lors de la capture du pokemon : " + e.getMessage());
+        }
+    }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
         if (pokemon == null) {

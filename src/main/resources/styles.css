@@ -1,0 +1,158 @@
+
+.root {
+
+    -fx-background-color: #3173d2; /* Excadecimal est un bleu un peu gris */
+    -fx-font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    -fx-font-size: 13px;
+}
+/* Texte generaL */
+.texte-interface-blanc {
+    -fx-text-fill: #ffffff !important;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.texte-titre-pokemon {
+    -fx-text-fill: #ffffff !important;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 4, 0, 0, 1);
+}
+
+.grid-pane .label {
+    -fx-text-fill: #ffffff; /* Swapped to white to match your blue frame context */
+    -fx-font-weight: bold;
+}
+
+/* Section de recherche */
+.text-field {
+        -fx-background-color: #ffffff; /* La bare est un blanc de titan */
+        -fx-background-radius: 7;
+        -fx-border-color: #cbd5e1; /* Bordure lilac */
+        -fx-border-radius: 7;
+        -fx-padding: 7 12 7 12;
+        -fx-text-fill: #1e293b; /* Gris bleu */
+        -fx-prompt-text-fill: #94a3b8; /* Gris pale */
+}
+
+.text-field:focused {
+    -fx-border-color: #ef4444; /*  */
+    -fx-background-color: #ffffff;
+}
+
+/* Liste deroulante d'otpion de recherche */
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 7;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 7;
+    -fx-padding: 2;
+}
+
+.combo-box .cell {
+    -fx-text-fill: #1e293b;
+}
+
+.combo-box:focused {
+    -fx-border-color: #ef4444;
+}
+
+/* Bouton Trouver */
+.button {
+        -fx-background-color: #ef4444; /* Rouge */
+        -fx-text-fill: #ffffff;
+        -fx-font-weight: bold;
+        -fx-background-radius: 8;
+        -fx-padding: 8 24 8 24;
+}
+
+.button:hover {
+    -fx-background-color: #dc2626; /* Rouge un peu plus foncer */
+}
+
+.button:pressed {
+    -fx-background-color: #b91c1c; /* Rouge beaucoup plus foncer */
+}
+/* Bouton Capturer */
+.button:disabled {
+    -fx-opacity: 0.5;
+    -fx-background-color: #cbd5e1;
+    -fx-text-fill: #64748b;
+}
+
+/* Green theme accent when a capture is valid and primed */
+#bouttonCapturer, .button[text="Capturer"] {
+    -fx-background-color: #22c55e; /* Vibrant Catch Green */
+    -fx-text-fill: #ffffff;
+}
+
+#bouttonCapturer:hover, .button[text="Capturer"]:hover {
+    -fx-background-color: #16a34a; /* Deep emerald green */
+}
+
+.label {
+    -fx-text-fill: #000000;
+    -fx-font-size: 13px;
+}
+
+.root > .label,
+.hbox > .label,
+.vbox > .label {
+    -fx-text-fill: #ffffff;
+}
+
+.grid-pane .label {
+    -fx-text-fill: #1e293b;
+}
+
+/* Message d'erreur */
+#messageErreur, .label[text-fill="red"] {
+    -fx-text-fill: #c84646;
+    -fx-font-weight: 600;
+    -fx-font-size: 16px;
+} /* Ameliorer la visibiliter */
+
+/* Panneau de droite */
+
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-padding: 4;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #475569;
+    -fx-padding: 10 12 10 12;
+    -fx-background-radius: 6;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #fee2e2; /* Soft red tint accentuation */
+    -fx-text-fill: #dc2626;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #ef4444; /* Solid crimson background selection fill */
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+/* Bar des statistiques */
+
+.progress-bar {
+    -fx-background-radius: 20;
+    -fx-padding: 0;
+}
+
+.progress-bar .track {
+    -fx-background-color: #e2e8f0; /* Soft gray tracking layout gauge channel */
+    -fx-background-radius: 20;
+}
+
+.progress-bar .bar {
+    -fx-background-color: linear-gradient(to right, #fca5a5, #ef4444);
+    -fx-background-radius: 20;
+}

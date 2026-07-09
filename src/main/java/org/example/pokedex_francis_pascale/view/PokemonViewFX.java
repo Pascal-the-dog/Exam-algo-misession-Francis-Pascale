@@ -14,6 +14,7 @@ public class PokemonViewFX {
     public final ComboBox<String> SelecteurOption;
     public final TextField champRecherche;
     public final Button bouttonRecherche;
+    public final Button bouttonCapturer;
     public final Label lblPokemonIdNom;
     public final Label valleurHp, valleurAttack, valleurAttackSp, valleurDefense, valleurDefenseSp, valleurVitesse;
     public final ProgressBar barHp, barAttack, barAttackSp, barDefense, barDefenseSp, barVitesse;
@@ -59,9 +60,13 @@ public class PokemonViewFX {
         bouttonRecherche = new Button("Trouver");
         bouttonRecherche.setStyle("-fx-cursor: hand;");
 
-        HBox sectionRecherche = new HBox(10, lblRecherchePar, SelecteurOption, champRecherche, bouttonRecherche);
+        bouttonCapturer = new Button("Capturer");
+        bouttonCapturer.setStyle("fx-cursor: hand;");
+        bouttonCapturer.setDisable(true);
+
+        HBox sectionRecherche = new HBox(10, lblRecherchePar, SelecteurOption, champRecherche, bouttonRecherche, bouttonCapturer);
         sectionRecherche.setAlignment(Pos.TOP_LEFT);
-        sectionRecherche.setPadding(new Insets(5,5,20,5));
+        sectionRecherche.setPadding(new Insets(5, 5, 20, 5));
 
         // image de pokemon, elle devrait etre au centre a gauche
         imagePokemon = new ImageView();
@@ -85,12 +90,18 @@ public class PokemonViewFX {
         lblStatsTitre.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
         GridPane PanneauStats = new GridPane();
 
-        valleurHp = new Label("-"); barHp = StatBar();
-        valleurAttack = new Label("-"); barAttack = StatBar();
-        valleurAttackSp = new Label("-"); barAttackSp = StatBar();
-        valleurDefense = new Label("-"); barDefense = StatBar();
-        valleurDefenseSp = new Label("-"); barDefenseSp = StatBar();
-        valleurVitesse = new Label("-"); barVitesse = StatBar();
+        valleurHp = new Label("-");
+        barHp = StatBar();
+        valleurAttack = new Label("-");
+        barAttack = StatBar();
+        valleurAttackSp = new Label("-");
+        barAttackSp = StatBar();
+        valleurDefense = new Label("-");
+        barDefense = StatBar();
+        valleurDefenseSp = new Label("-");
+        barDefenseSp = StatBar();
+        valleurVitesse = new Label("-");
+        barVitesse = StatBar();
 
         LigneStats(PanneauStats, "Point de vie: ", valleurHp, barHp, 0);
         LigneStats(PanneauStats, "Attaque: ", valleurAttack, barAttack, 1);
@@ -132,8 +143,24 @@ public class PokemonViewFX {
         racine.setPadding(new Insets(15));
         racine.setTop(sectionRecherche);
         racine.setCenter(conteneurPrincipal);
+
+        lblRecherchePar.getStyleClass().add("texte-interface-blanc");
+        lblListeTitre.getStyleClass().add("texte-interface-blanc");
+        lblPokemonIdNom.getStyleClass().add("texte-titre-pokemon");
+        lblStatsTitre.getStyleClass().add("texte-titre-pokemon");
+        messageErreur.setId("messageErreur");
+
+        try {
+            String cssPath = getClass().getResource("/styles.css").toExternalForm();
+            racine.getStylesheets().add(cssPath);
+        } catch (NullPointerException e) {
+            System.err.println("CSS expansion warning: Could not find /styles.css in the resources folder.");
+        }
     }
     public Parent getRoot(){
         return racine;
     }
 }
+
+
+// TODO: Ajouter un bouton ajouter pour ajouter un pokemon qui n'est pas dans la liste
