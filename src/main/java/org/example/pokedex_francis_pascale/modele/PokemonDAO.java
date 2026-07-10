@@ -1,13 +1,15 @@
 package org.example.pokedex_francis_pascale.modele;
 
+import org.example.pokedex_francis_pascale.exceptions.BaseDeDonneesException;
 import org.example.pokedex_francis_pascale.utils.Connexion;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
-
 
 public class PokemonDAO {
+
+    // INSERT + UPDATE (UPSERT)
     public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
@@ -31,16 +33,18 @@ public class PokemonDAO {
             pre.setInt(1, pokemon.id);
             pre.setString(2, pokemon.nom);
             pre.setString(3, pokemon.type);
-            pre.setString(4, pokemon.type2);
+            pre.setString(4, pokemon.type2); // type_2
             pre.setInt(5, pokemon.hp);
-            pre.setInt(6, pokemon.attack);
-            pre.setInt(7, pokemon.attackSp);
+            pre.setInt(6, pokemon.attack); // attaque
+            pre.setInt(7, pokemon.attackSp); // attaque_speciale
             pre.setInt(8, pokemon.defense);
-            pre.setInt(9, pokemon.defenseSp);
+            pre.setInt(9, pokemon.defenseSp); // defense_speciale
             pre.setInt(10, pokemon.vitesse);
             pre.setString(11, pokemon.image_url);
 
             pre.executeUpdate();
+        } catch (SQLException e) {
+            throw new BaseDeDonneesException("Erreur lors de la sauvegarde du Pokémon", e);
         }
     }
 
@@ -66,10 +70,13 @@ public class PokemonDAO {
                 pokemon.defenseSp = rs.getInt("defense_speciale");
                 pokemon.vitesse = rs.getInt("vitesse");
                 pokemon.image_url = rs.getString("image_url");
+
                 tousEnsemble.add(pokemon);
             }
-
+        } catch (SQLException e) {
+            throw new BaseDeDonneesException("Erreur lors du chargement des Pokémons", e);
         }
+
         return tousEnsemble;
     }
     public void relacherPokemon(int id) throws SQLException {
@@ -77,8 +84,10 @@ public class PokemonDAO {
 
         try (Connection connect = Connexion.getConnexion();
              PreparedStatement pre = connect.prepareStatement(sql)) {
-            pre.setInt(1, id);
-            pre.executeUpdate();
+                pre.setInt(1, id);
+                pre.executeUpdate();
+        }  catch (SQLException e) {
+            throw new BaseDeDonneesException("Erreur lors du relachement du Pokémon", e);
         }
     }
 }

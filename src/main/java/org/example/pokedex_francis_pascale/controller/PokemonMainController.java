@@ -1,6 +1,11 @@
 package org.example.pokedex_francis_pascale.controller;
 
+import javafx.application.Platform;
 import javafx.scene.control.Label;
+import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
+import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
+import org.example.pokedex_francis_pascale.exceptions.ApiTimeoutException;
+import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
@@ -41,16 +46,49 @@ public class PokemonMainController {
             return;
         }
 
-        try {
-            Pokemon pokemon = service.recuperer(recherche.trim());
-            pokemonTrouverListe = pokemon;
-            afficherPokemonDetails(pokemon);
+        new Thread(() -> {
+            try {
+                Pokemon pokemon = service.recuperer(recherche.trim());
+                pokemonTrouverListe = pokemon;
 
-        } catch (Exception e) {
-            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
-            clearPokemonDetails();
-        }
+                Platform.runLater(() -> {
+                    afficherPokemonDetails(pokemon);
+
+                });
+
+            } catch (PokemonIntrouvableException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur 404 : " + e.getMessage());
+                    clearPokemonDetails();
+                });
+
+            } catch (ApiErreurException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur API : " + e.getMessage());
+                    clearPokemonDetails();
+                });
+
+            } catch (ApiConnexionException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur de connexion : " + e.getMessage());
+                    clearPokemonDetails();
+                });
+
+            } catch (ApiTimeoutException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur : " + e.getMessage());
+                    clearPokemonDetails();
+                });
+
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur inattendue : " + e.getMessage());
+                    clearPokemonDetails();
+                });
+            }
+        }).start();
     }
+
     public void capturerPokemon() {
         if (pokemonTrouverListe == null) {
             return;
@@ -70,19 +108,25 @@ public class PokemonMainController {
         Pokemon selectionList = view.listePokemon.getSelectionModel().getSelectedItem();
 
         if (selectionList == null && pokemonTrouverListe != null) {
-            for (Pokemon pokemonLister : view.listePokemon.getItems()) {
-                if (pokemonLister.id == pokemonTrouverListe.id) {
-                    selectionList = pokemonLister;
+            for (Pokemon pokemonDansLaListe : view.listePokemon.getItems()) {
+                if (pokemonDansLaListe.id == pokemonTrouverListe.id) {
+                    selectionList = pokemonDansLaListe;
                     break;
                 }
             }
         }
-
-
         if (selectionList == null) {
             return;
         }
-        // TODO: HADLE ERROR FOR RELEASING POKEMON BUTTON FROM DATABASE
+        try{
+            dao.relacherPokemon(selectionList.id);
+            refreshList();
+            view.bouttonRelacher.setDisable(true);
+            pokemonTrouverListe = null;
+            view.messageErreur.setText("");
+        } catch (Exception e) {
+            view.messageErreur.setText("Erreur lors du relachement : " + e.getMessage());
+        }
     }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
@@ -122,6 +166,14 @@ public class PokemonMainController {
         view.barDefenseSp.setProgress(pokemon.defenseSp / 255.0);
         view.barVitesse.setProgress(pokemon.vitesse / 255.0);
 
+        if (pokemon.image_url != null && !pokemon.image_url.isEmpty()) {
+            Image img = new Image(pokemon.image_url, true);
+            view.imagePokemon.setImage(img);
+        } else {
+            view.imagePokemon.setImage(null);
+        }
+
+
         boolean dejaCapturer = false;
         for (Pokemon pokemoncapturer : view.listePokemon.getItems()) {
             if (pokemoncapturer.id == pokemon.id) {
@@ -135,13 +187,6 @@ public class PokemonMainController {
         } else {
             view.bouttonCapturer.setDisable(false);
             view.bouttonRelacher.setDisable(true);
-        }
-
-        if (pokemon.image_url != null && !pokemon.image_url.isEmpty()) {
-            Image img = new Image(pokemon.image_url, true);
-            view.imagePokemon.setImage(img);
-        } else {
-            view.imagePokemon.setImage(null);
         }
     }
 
