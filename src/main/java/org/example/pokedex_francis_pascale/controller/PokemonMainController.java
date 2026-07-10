@@ -73,6 +73,8 @@ public class PokemonMainController {
                     Platform.runLater(() -> {
                         Media audioFile = new Media(tempFile.toURI().toString());
                         mediaPlayer = new MediaPlayer(audioFile);
+
+
                         mediaPlayer.setOnReady(() -> mediaPlayer.play());
                         mediaPlayer.setOnError(()->{
                             view.messageErreur.setText("Erreur Audio: " + mediaPlayer.getError());
