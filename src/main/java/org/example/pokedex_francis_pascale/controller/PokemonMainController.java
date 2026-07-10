@@ -165,9 +165,12 @@ public class PokemonMainController {
         if (!new ConfirmationBox().boite("Voulez vous vraiment relacher ce Pokémon ?", "Confirmation")) {
             return;
         }
+
+        final Pokemon selectionFinal = selectionList;
+
         new Thread(() -> {
             try{
-                dao.relacherPokemon(selectionList.id);
+                dao.relacherPokemon(selectionFinal.id);
                 Platform.runLater(() -> {
                     refreshList();
                     view.bouttonRelacher.setDisable(true);
