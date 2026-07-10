@@ -1,7 +1,3 @@
 package org.example.pokedex_francis_pascale.exceptions;
 
-public class ApiErreurException extends RuntimeException {
-    public ApiErreurException() {
-        super("Serveur indisponible");
-    }
-}
+public class ApiErreurException extends Exception {}

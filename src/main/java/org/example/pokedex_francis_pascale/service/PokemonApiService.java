@@ -2,10 +2,7 @@ package org.example.pokedex_francis_pascale.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
-import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
-import org.example.pokedex_francis_pascale.exceptions.ApiTimeoutException;
-import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
+import org.example.pokedex_francis_pascale.exceptions.*;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.utils.Types;
 
@@ -14,6 +11,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class PokemonApiService {
@@ -21,11 +22,30 @@ public class PokemonApiService {
     private static final String URL = "https://pokeapi.co/api/v2/pokemon/";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Map<String, Pokemon> cache = new HashMap<>(); //Cache local -> string: parce quon peut chercher par nom ou id
+    private final List<Long> historiqueRequetes = new ArrayList<>();
 
     public Pokemon recuperer(String search) throws Exception{
 
+        search = search.toLowerCase().trim();
+
+        if(cache.containsKey(search)){ // cherche si le pokemon est dans le cache
+            return cache.get(search);
+        }
+
+
+
         try {
-            HttpRequest req = HttpRequest.newBuilder(URI.create(URL + search.toLowerCase()))
+            long maintenant = System.currentTimeMillis();
+            historiqueRequetes.add(maintenant);
+            historiqueRequetes.removeIf(t -> maintenant - t > 60_000);
+
+            if (historiqueRequetes.size() > 100) {
+                throw new RequestesTropFrequentesException();
+
+            }
+
+            HttpRequest req = HttpRequest.newBuilder(URI.create(URL + search))
                     .timeout(java.time.Duration.ofSeconds(5))
                     .GET()
                     .build();
@@ -71,19 +91,24 @@ public class PokemonApiService {
             String cleanName = p.nom.toLowerCase().trim();
             p.cry_url = "https://play.pokemonshowdown.com/audio/cries/" + cleanName + ".mp3";
 
-
+            cache.put(search, p); // insere dans le cache
+            cache.put(String.valueOf(p.id), p); //insere dans le cache par ID aussi
+            cache.put(p.nom.toLowerCase(), p);
             return p;
 
         } catch (java.net.http.HttpTimeoutException e) {
-            throw new ApiTimeoutException();
-
-        } catch (IOException e){
-            throw new ApiConnexionException();
+            throw new ApiPokemonException("Timeout : la requête a pris trop de temps.");
+        } catch (IOException e) {
+            throw new ApiPokemonException("Erreur de connexion : impossible de joindre la PokéAPI.");
+        } catch (PokemonIntrouvableException e) {
+            throw new ApiPokemonException("Erreur 404 : Pokémon introuvable.");
+        } catch (ApiErreurException e) {
+            throw new ApiPokemonException("Erreur API : la PokéAPI a rencontré un problème.");
+        } catch (RequestesTropFrequentesException e) {
+            throw new ApiPokemonException("Trop de requêtes : ralentissez un peu.");
+        } catch (Exception e) {
+            throw new ApiPokemonException("Erreur inattendue : " + e.getMessage());
         }
-
-
-
-
 
     }
 }

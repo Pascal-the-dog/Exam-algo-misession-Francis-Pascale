@@ -4,16 +4,15 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
-import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
-import org.example.pokedex_francis_pascale.exceptions.ApiTimeoutException;
-import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
+import org.example.pokedex_francis_pascale.exceptions.*;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
 import org.example.pokedex_francis_pascale.utils.ConfirmationBox;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
+
+import java.util.List;
 
 public class PokemonMainController {
 
@@ -46,44 +45,45 @@ public class PokemonMainController {
         if (actif == null) {
             actif = view.listePokemon.getSelectionModel().getSelectedItem();
         }
-
-        if (actif != null && actif.cry_url != null && !actif.cry_url.isEmpty()) {
-            try {
-                if (mediaPlayer != null) {
-                    mediaPlayer.stop();
-                    mediaPlayer.dispose();
-                }
-
-                view.messageErreur.setText("");
-
-                String audioUrl = actif.cry_url.trim();
-                java.net.URL url = new java.net.URL(audioUrl);
-
-                java.io.File tempFile = java.io.File.createTempFile("pokemon_cry_", ".mp3");
-                tempFile.deleteOnExit();
-
-                try (java.io.InputStream in = url.openStream();
-                     java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, bytesRead);
+        final Pokemon actifFinal = actif;
+        if (actifFinal != null && actifFinal.cry_url != null && !actifFinal.cry_url.isEmpty()) {
+            new Thread(() -> {
+                try {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.stop();
+                        mediaPlayer.dispose();
                     }
+
+                    view.messageErreur.setText("");
+
+                    String audioUrl = actifFinal.cry_url.trim();
+                    java.net.URL url = new java.net.URL(audioUrl);
+                    java.io.File tempFile = java.io.File.createTempFile("pokemon_cry_", ".mp3");
+                    tempFile.deleteOnExit();
+
+                    try (java.io.InputStream in = url.openStream();
+                         java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, bytesRead);
+                        }
+                    }
+
+                    Platform.runLater(() -> {
+                        Media audioFile = new Media(tempFile.toURI().toString());
+                        mediaPlayer = new MediaPlayer(audioFile);
+                        mediaPlayer.setOnReady(() -> mediaPlayer.play());
+                        mediaPlayer.setOnError(()->{
+                            view.messageErreur.setText("Erreur Audio: " + mediaPlayer.getError());
+                        });
+                    });
+
+                } catch (Exception ex) {
+                    view.messageErreur.setText("Impossible de charger le cri: " + ex.getMessage());
+                    ex.printStackTrace();
                 }
-
-                javafx.scene.media.Media audioFile = new javafx.scene.media.Media(tempFile.toURI().toString());
-                mediaPlayer = new javafx.scene.media.MediaPlayer(audioFile);
-
-                mediaPlayer.setOnReady(() -> mediaPlayer.play());
-
-                mediaPlayer.setOnError(() -> {
-                    view.messageErreur.setText("Erreur Audio: " + mediaPlayer.getError().getMessage());
-                });
-
-            } catch (Exception ex) {
-                view.messageErreur.setText("Impossible de charger le cri: " + ex.getMessage());
-                ex.printStackTrace();
-            }
+            }).start();
         }
     }
 
@@ -109,27 +109,9 @@ public class PokemonMainController {
 
                 });
 
-            } catch (PokemonIntrouvableException e) {
+            } catch (ApiPokemonException e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur 404 : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiErreurException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur API : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiConnexionException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur de connexion : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiTimeoutException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur : " + e.getMessage());
+                    view.messageErreur.setText("Erreur requête: " + e.getMessage());
                     clearPokemonDetails();
                 });
 
@@ -149,15 +131,21 @@ public class PokemonMainController {
         if (!new ConfirmationBox().boite("Capturer ce Pokémon?", "Confirmation")) {
             return;
         }
-        try {
-            dao.sauvegarder(pokemonTrouverListe);
-            refreshList();
-            view.listePokemon.getSelectionModel().select(pokemonTrouverListe);
-            view.bouttonCapturer.setDisable(true);
-            view.champRecherche.clear();
-        } catch (Exception e) {
-            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
-        }
+        new Thread(() -> {
+            try {
+                dao.sauvegarder(pokemonTrouverListe);
+                Platform.runLater(() -> {
+                    refreshList();
+                    view.listePokemon.getSelectionModel().select(pokemonTrouverListe);
+                    view.bouttonCapturer.setDisable(true);
+                    view.champRecherche.clear();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
+                });
+            }
+        }).start();
     }
 
     public void relacherPokemon() {
@@ -177,15 +165,24 @@ public class PokemonMainController {
         if (!new ConfirmationBox().boite("Voulez vous vraiment relacher ce Pokémon ?", "Confirmation")) {
             return;
         }
-        try{
-            dao.relacherPokemon(selectionList.id);
-            refreshList();
-            view.bouttonRelacher.setDisable(true);
-            pokemonTrouverListe = null;
-            view.messageErreur.setText("");
-        } catch (Exception e) {
-            view.messageErreur.setText("Erreur lors du relachement : " + e.getMessage());
-        }
+
+        final Pokemon selectionFinal = selectionList;
+
+        new Thread(() -> {
+            try{
+                dao.relacherPokemon(selectionFinal.id);
+                Platform.runLater(() -> {
+                    refreshList();
+                    view.bouttonRelacher.setDisable(true);
+                    pokemonTrouverListe = null;
+                    view.messageErreur.setText("");
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur lors du relachement : " + e.getMessage());
+                });
+            }
+        }).start();
     }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
@@ -273,11 +270,18 @@ public class PokemonMainController {
     }
 
     public void refreshList() {
-        try {
-            view.listePokemon.getItems().setAll(dao.lister());
-        } catch (Exception e) {
-            view.messageErreur.setText("Erreur dans la base de données : " + e.getMessage());
-        }
+        new Thread(() -> {
+            try {
+                List<Pokemon> liste = dao.lister();
+                Platform.runLater(() -> {
+                    view.listePokemon.getItems().setAll(liste);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur dans la base de données : " + e.getMessage());
+                });
+            }
+        }).start();
     }
 
     public void demarrer() {
