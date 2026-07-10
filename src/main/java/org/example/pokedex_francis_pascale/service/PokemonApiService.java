@@ -68,8 +68,8 @@ public class PokemonApiService {
 
             p.image_url = pokemon.get("sprites").get("front_default").asText();
 
-            String cleanName = p.nom.toLowerCase().trim();
-            p.cry_url = "https://play.pokemonshowdown.com/audio/cries/" + cleanName + ".mp3";
+            String NomDeCri = p.nom.toLowerCase().trim();
+            p.cry_url = "https://play.pokemonshowdown.com/audio/cries/" + NomDeCri + ".mp3";
 
 
             return p;
