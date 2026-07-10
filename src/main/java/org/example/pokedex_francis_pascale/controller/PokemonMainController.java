@@ -4,10 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
-import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
-import org.example.pokedex_francis_pascale.exceptions.ApiTimeoutException;
-import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
+import org.example.pokedex_francis_pascale.exceptions.*;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
@@ -109,27 +106,9 @@ public class PokemonMainController {
 
                 });
 
-            } catch (PokemonIntrouvableException e) {
+            } catch (ApiPokemonException e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur 404 : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiErreurException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur API : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiConnexionException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur de connexion : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiTimeoutException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur : " + e.getMessage());
+                    view.messageErreur.setText("Erreur requête: " + e.getMessage());
                     clearPokemonDetails();
                 });
 
