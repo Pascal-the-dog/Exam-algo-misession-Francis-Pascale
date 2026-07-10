@@ -1,5 +1,9 @@
 package org.example.pokedex_francis_pascale.modele;
 
+import org.example.pokedex_francis_pascale.utils.Capitalize;
+
+import static org.example.pokedex_francis_pascale.utils.Capitalize.capitalize;
+
 public class Pokemon {
     public int id;
     public String nom;
@@ -17,6 +21,6 @@ public class Pokemon {
     public Pokemon(){}
     @Override
     public String toString() {
-        return nom + " (#" + id + ")";
+        return capitalize(nom) + " · #" + id;
     }
 }

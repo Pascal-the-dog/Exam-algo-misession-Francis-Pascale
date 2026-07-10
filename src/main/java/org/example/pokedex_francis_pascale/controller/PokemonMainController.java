@@ -1,6 +1,7 @@
 package org.example.pokedex_francis_pascale.controller;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -9,6 +10,7 @@ import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
 import org.example.pokedex_francis_pascale.utils.ConfirmationBox;
+import org.example.pokedex_francis_pascale.utils.MessageUtils;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
 
@@ -39,6 +41,24 @@ public class PokemonMainController {
                         jouerPokemonCri();
                     }
                 });
+        view.selecteurOption.setOnAction(this::onOptionChange);
+    }
+
+    private void onOptionChange(ActionEvent e) {
+        String valeur = view.selecteurOption.getValue();
+        switch (valeur) {
+            case "Type" -> {
+                view.montrerCombo();
+            }
+            case "Génération" -> {
+                view.montrerCombo();
+            }
+            case "ID / Nom" -> {
+                view.montrerChampTexte();
+            }
+            }
+
+
     }
 
     private void jouerPokemonCri() {
@@ -49,7 +69,7 @@ public class PokemonMainController {
 
         if (actif == null || actif.cry_url == null || actif.cry_url.trim().isEmpty()) {
             Platform.runLater(() -> {
-                view.messageErreur.setText("Ce Pokémon n'a pas de cri disponible.");
+                MessageUtils.afficherMessage(view.messageErreur, "Ce Pokémon n'a pas de cri disponible.");
             });
             return;
         }
@@ -72,7 +92,7 @@ public class PokemonMainController {
                     mediaPlayer.dispose();
                 }
 
-                Platform.runLater(() -> view.messageErreur.setText(""));
+                Platform.runLater(() -> MessageUtils.effacerMessage(view.messageErreur));
 
                 java.net.URL url = new java.net.URL(audioUrl);
                 java.io.File tempFile = java.io.File.createTempFile("pokemon_cry_", ".mp3");
@@ -85,10 +105,10 @@ public class PokemonMainController {
                     while ((bytesRead = in.read(buffer)) != -1) {
                         out.write(buffer, 0, bytesRead);
                     }
-
+                }
                 if (tempFile.length() == 0) {
                     Platform.runLater(() -> {
-                        view.messageErreur.setText("Ce Pokémon n'a pas de cri disponible.");
+                        MessageUtils.afficherMessage(view.messageErreur, "Ce Pokémon n'a pas de cri disponible.");
                     });
                     return;
                 }
@@ -106,16 +126,16 @@ public class PokemonMainController {
                         mediaPlayer.setOnError(() -> {
                             Throwable err = mediaPlayer.getError();
                             String msg = (err != null ? err.getMessage() : "Erreur audio inconnue");
-                            view.messageErreur.setText("Erreur Audio: " + msg);
+                            MessageUtils.afficherMessage(view.messageErreur, "Erreur Audio: " + msg);
                         });
                     } catch (Exception e) {
-                        view.messageErreur.setText("Erreur Audio: " + e.getMessage());
+                        MessageUtils.afficherMessage(view.messageErreur, "Erreur Audio: " + e.getMessage());
                     }
                 });
 
             } catch (Exception ex) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Impossible de charger le cri: " + ex.getMessage());
+                    MessageUtils.afficherMessage(view.messageErreur, "Impossible de charger le cri: " + ex.getMessage());
                 });
                 ex.printStackTrace();
             }
@@ -124,9 +144,9 @@ public class PokemonMainController {
 
 
     public void gererRecherche() {
-        String option = view.SelecteurOption.getValue();
+        String option = view.selecteurOption.getValue();
         String recherche = view.champRecherche.getText();
-        view.messageErreur.setText("");
+        MessageUtils.effacerMessage(view.messageErreur);;
 
         view.bouttonCapturer.setDisable(true);
 
@@ -151,7 +171,7 @@ public class PokemonMainController {
         try {
             gen = Integer.parseInt(texteGen);
         } catch (NumberFormatException e) {
-            view.messageErreur.setText("Veuillez entrer un nombre valide (ex: 1 pour Gen 1).");
+            MessageUtils.afficherMessage(view.messageErreur, "Veuillez entrer un nombre valide (ex: 1 pour Gen 1).");
             return;
         }
         int minId = 0;
@@ -168,7 +188,7 @@ public class PokemonMainController {
             case 8 -> { minId = 810;  maxId = 905;  }
             case 9 -> { minId = 906;  maxId = 1025; }
             default -> {
-                view.messageErreur.setText("Génération " + gen + " non supportée (Choisissez de 1 à 9).");
+                MessageUtils.afficherMessage(view.messageErreur, "Génération " + gen + " non supportée (Choisissez de 1 à 9).");
                 return;
             }
         }
@@ -182,7 +202,7 @@ public class PokemonMainController {
                     .collect(Collectors.toList());
 
             if (filtrer.isEmpty()) {
-                view.messageErreur.setText("Aucun Pokémon de la Génération " + gen + " dans votre inventaire.");
+                MessageUtils.afficherMessage(view.messageErreur, "Aucun Pokémon de la Génération " + gen + " dans votre inventaire.");
             }
 
             view.listePokemon.getItems().setAll(filtrer);
@@ -190,7 +210,7 @@ public class PokemonMainController {
             view.bouttonRelacher.setDisable(true);
 
         } catch (Exception e) {
-            view.messageErreur.setText("Erreur lors du filtrage par génération : " + e.getMessage());
+            MessageUtils.afficherMessage(view.messageErreur, "Erreur lors du filtrage par génération : " + e.getMessage());
         }
     }
 
@@ -204,26 +224,26 @@ public class PokemonMainController {
                     .collect(Collectors.toList());
 
             if (filtrer.isEmpty()) {
-                view.messageErreur.setText("Aucun Pokémon de type '" + typeRecherche + "' dans votre inventaire.");
+                MessageUtils.afficherMessage(view.messageErreur, "Aucun Pokémon de type '" + typeRecherche + "' dans votre inventaire.");
             }
             view.listePokemon.getItems().setAll(filtrer);
             clearPokemonDetails();
             view.bouttonRelacher.setDisable(true);
 
         } catch (Exception e) {
-            view.messageErreur.setText("Erreur lors du filtrage par type : " + e.getMessage());
+            MessageUtils.afficherMessage(view.messageErreur, "Erreur lors du filtrage par type : " + e.getMessage());
         }
     }
 
     public void chargerDepuisApi() {
         String recherche = view.champRecherche.getText();
-        view.messageErreur.setText("");
+        MessageUtils.effacerMessage(view.messageErreur);;
         view.listePokemon.getSelectionModel().clearSelection();
         pokemonTrouverListe = null;
         view.bouttonCapturer.setDisable(true);
 
         if (recherche == null || recherche.trim().isEmpty()) {
-            view.messageErreur.setText("Veuillez entrer un ID ou un nom.");
+            MessageUtils.afficherMessage(view.messageErreur, "Veuillez entrer un ID ou un nom.");
             return;
         }
 
@@ -239,13 +259,13 @@ public class PokemonMainController {
 
             } catch (ApiPokemonException e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur requête: " + e.getMessage());
+                    MessageUtils.afficherMessage(view.messageErreur, "Erreur requête: " + e.getMessage());
                     clearPokemonDetails();
                 });
 
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur inattendue : " + e.getMessage());
+                    MessageUtils.afficherMessage(view.messageErreur, "Erreur inattendue : " + e.getMessage());
                     clearPokemonDetails();
                 });
             }
@@ -270,7 +290,7 @@ public class PokemonMainController {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
+                    MessageUtils.afficherMessage(view.messageErreur, "Pokémon introuvable ou erreur d'API : " + e.getMessage());
                 });
             }
         }).start();
@@ -303,11 +323,11 @@ public class PokemonMainController {
                     refreshList();
                     view.bouttonRelacher.setDisable(true);
                     pokemonTrouverListe = null;
-                    view.messageErreur.setText("");
+                    MessageUtils.effacerMessage(view.messageErreur);;
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur lors du relachement : " + e.getMessage());
+                    MessageUtils.afficherMessage(view.messageErreur, "Erreur lors du relachement : " + e.getMessage());
                 });
             }
         }).start();
@@ -320,7 +340,7 @@ public class PokemonMainController {
         }
 
         view.conteneurTypes.getChildren().clear();
-        view.lblPokemonIdNom.setText("#" + pokemon.id + " " + pokemon.nom);
+        view.lblPokemonIdNom.setText(pokemon.toString());
 
         Label premierType = new Label(pokemon.type.toUpperCase());
         premierType.getStyleClass().addAll("type-badge", "type-" + pokemon.type.toLowerCase().trim());
@@ -406,7 +426,7 @@ public class PokemonMainController {
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur dans la base de données : " + e.getMessage());
+                    MessageUtils.afficherMessage(view.messageErreur, "Erreur dans la base de données : " + e.getMessage());
                 });
             }
         }).start();
@@ -414,5 +434,7 @@ public class PokemonMainController {
 
     public void demarrer() {
         refreshList();
+        MessageUtils.effacerMessage(view.messageErreur);
+        view.montrerChampTexte();
     }
 }

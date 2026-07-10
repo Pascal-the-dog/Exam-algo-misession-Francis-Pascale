@@ -12,8 +12,9 @@ import javafx.scene.layout.*;
 
 
 public class PokemonViewFX {
-    public final ComboBox<String> SelecteurOption;
-    public final TextField champRecherche;
+    public final ComboBox<String> selecteurOption;
+    public ComboBox<String> comboRecherche;
+    public TextField champRecherche;
     public final Button bouttonRecherche;
     public final Button bouttonCapturer;
     public final Button bouttonRelacher;
@@ -35,6 +36,21 @@ public class PokemonViewFX {
         return bar;
     }
 
+    public void montrerChampTexte() {
+        champRecherche.setVisible(true);
+        champRecherche.setManaged(true);
+        comboRecherche.setVisible(false);
+        comboRecherche.setManaged(false);
+    }
+
+    public void montrerCombo() {
+        champRecherche.setVisible(false);
+        champRecherche.setManaged(false);
+        comboRecherche.setVisible(true);
+        comboRecherche.setManaged(true);
+    }
+
+
     void LigneStats(GridPane grid, String nomStat, Label labelValeur, ProgressBar bar, int ligne) {
         Label nameLabel = new Label(nomStat);
         nameLabel.setPrefWidth(110);
@@ -51,14 +67,18 @@ public class PokemonViewFX {
 
         // Bar et bouton de recherche
         Label lblRecherchePar = new Label("Recherche Par : ");
-        SelecteurOption = new ComboBox<>();
-        SelecteurOption.getItems().addAll("ID / Nom", "Type", "Génération");
-        SelecteurOption.setValue("ID / Nom");
-        SelecteurOption.setPrefWidth(120);
+        selecteurOption = new ComboBox<>();
+        selecteurOption.getItems().addAll("ID / Nom", "Type", "Génération");
+        selecteurOption.setValue("ID / Nom");
+        selecteurOption.setPrefWidth(120);
 
         champRecherche = new TextField();
         champRecherche.setPromptText("Trouver un pokemon");
         HBox.setHgrow(champRecherche, Priority.ALWAYS);
+
+        comboRecherche = new ComboBox<>();
+        comboRecherche.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(comboRecherche, Priority.ALWAYS);
 
         bouttonRecherche = new Button("Trouver");
         bouttonRecherche.setStyle("-fx-cursor: hand;");
@@ -73,7 +93,7 @@ public class PokemonViewFX {
         bouttonRelacher.setMaxWidth(Double.MAX_VALUE);
         VBox.setMargin(bouttonRelacher, new Insets(5, 0, 0,0));
 
-        HBox sectionRecherche = new HBox(10, lblRecherchePar, SelecteurOption, champRecherche, bouttonRecherche, bouttonCapturer);
+        HBox sectionRecherche = new HBox(10, lblRecherchePar, selecteurOption, champRecherche, comboRecherche, bouttonRecherche, bouttonCapturer);
         sectionRecherche.setAlignment(Pos.TOP_LEFT);
         sectionRecherche.setPadding(new Insets(5, 5, 20, 5));
 
@@ -84,9 +104,15 @@ public class PokemonViewFX {
         imagePokemon.setPreserveRatio(true);
 
         StackPane ImagePokemonPlaceholder = new StackPane(imagePokemon);
-        ImagePokemonPlaceholder.setStyle("-fx-border-color: #dddddd; -fx-border-width: 1.5; -fx-border-radius: 8; " +
-                "-fx-background-radius: 8; -fx-background-color: #ffffff; " +
-                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);");
+        ImagePokemonPlaceholder.setStyle(
+                "-fx-border-color: #facc15;" +
+                "-fx-border-width: 3.5;" +
+                "-fx-border-radius: 14;" +
+                "-fx-background-radius: 14;" +
+                "-fx-background-color: linear-gradient(to bottom, #ffffff, #f5f5f5);" +
+                "-fx-background-insets: 0, 2;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.3, 0, 4);"
+        );
         ImagePokemonPlaceholder.setPrefSize(200, 200);
         ImagePokemonPlaceholder.setMinSize(200, 200);
         ImagePokemonPlaceholder.setAlignment(Pos.CENTER);
@@ -149,7 +175,7 @@ public class PokemonViewFX {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText("#" + item.id + " - " + item.nom);
+                    setText(item.toString());
                 }
             }
         });
