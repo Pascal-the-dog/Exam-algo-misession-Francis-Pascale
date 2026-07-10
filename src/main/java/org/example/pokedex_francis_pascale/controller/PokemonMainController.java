@@ -68,6 +68,24 @@ public class PokemonMainController {
         }
     }
 
+    public void relacherPokemon() {
+        Pokemon selectionList = view.listePokemon.getSelectionModel().getSelectedItem();
+
+        if (selectionList == null && pokemonTrouverListe != null) {
+            for (Pokemon pokemonLister : view.listePokemon.getItems()) {
+                if (pokemonLister.id == pokemonTrouverListe.id) {
+                    selectionList = pokemonLister;
+                    break;
+                }
+            }
+        }
+
+        if (selectionList == null) {
+            return;
+        }
+        // TODO: HADLE ERROR FOR RELEASING POKEMON BUTTON FROM DATABASE
+    }
+
     public void afficherPokemonDetails(Pokemon pokemon) {
         if (pokemon == null) {
             clearPokemonDetails();
@@ -110,6 +128,20 @@ public class PokemonMainController {
             view.imagePokemon.setImage(img);
         } else {
             view.imagePokemon.setImage(null);
+        }
+        boolean dejaCapturer = false;
+        for (Pokemon pokemoncapturer : view.listePokemon.getItems()) {
+            if (pokemoncapturer.id == pokemon.id) {
+                dejaCapturer = true;
+                break;
+            }
+        }
+        if (dejaCapturer) {
+            view.bouttonCapturer.setDisable(true);
+            view.bouttonRelacher.setDisable(false);
+        } else {
+            view.bouttonCapturer.setDisable(false);
+            view.bouttonRelacher.setDisable(true);
         }
     }
 
