@@ -74,4 +74,13 @@ public class PokemonDAO {
 
         return tousEnsemble;
     }
+    public void relacherPokemon(int id) throws SQLException {
+        String sql = "DELETE FROM pokemon WHERE id = ?";
+
+        try (Connection connect = Connexion.getConnexion();
+             PreparedStatement pre = connect.prepareStatement(sql)) {
+            pre.setInt(1, id);
+            pre.executeUpdate();
+        }
+    }
 }

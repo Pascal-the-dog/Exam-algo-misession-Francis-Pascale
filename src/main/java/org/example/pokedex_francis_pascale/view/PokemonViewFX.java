@@ -15,6 +15,7 @@ public class PokemonViewFX {
     public final TextField champRecherche;
     public final Button bouttonRecherche;
     public final Button bouttonCapturer;
+    public final Button bouttonRelacher;
     public final Label lblPokemonIdNom;
     public final Label valleurHp, valleurAttack, valleurAttackSp, valleurDefense, valleurDefenseSp, valleurVitesse;
     public final ProgressBar barHp, barAttack, barAttackSp, barDefense, barDefenseSp, barVitesse;
@@ -62,8 +63,14 @@ public class PokemonViewFX {
         bouttonRecherche.setStyle("-fx-cursor: hand;");
 
         bouttonCapturer = new Button("Capturer");
-        bouttonCapturer.setStyle("fx-cursor: hand;");
+        bouttonCapturer.setStyle("-fx-cursor: hand;");
         bouttonCapturer.setDisable(true);
+
+        bouttonRelacher = new Button("Relâcher");
+        bouttonRelacher.setStyle("-fx-cursor: hand;");
+        bouttonRelacher.setDisable(true);
+        bouttonRelacher.setMaxWidth(Double.MAX_VALUE);
+        VBox.setMargin(bouttonRelacher, new Insets(5, 0, 0,0));
 
         HBox sectionRecherche = new HBox(10, lblRecherchePar, SelecteurOption, champRecherche, bouttonRecherche, bouttonCapturer);
         sectionRecherche.setAlignment(Pos.TOP_LEFT);
@@ -146,7 +153,7 @@ public class PokemonViewFX {
             }
         });
         VBox.setVgrow(listePokemon, Priority.ALWAYS);
-        PanneauListe.getChildren().addAll(lblListeTitre, listePokemon);
+        PanneauListe.getChildren().addAll(lblListeTitre, listePokemon, bouttonRelacher);
         PanneauListe.setPrefWidth(250);
         PanneauListe.setMinWidth(220);
 
