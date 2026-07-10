@@ -1,7 +1,7 @@
 module org.example.pokedex_francis_pascale {
     requires javafx.controls;
     requires java.net.http;
-
+    requires javafx.media;
 
     requires com.fasterxml.jackson.databind;
     requires java.sql;
