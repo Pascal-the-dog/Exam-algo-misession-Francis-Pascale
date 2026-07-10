@@ -2,6 +2,8 @@ package org.example.pokedex_francis_pascale.controller;
 
 import javafx.scene.control.Label;
 import javafx.application.Platform;
+import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
+import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
 import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
@@ -55,6 +57,18 @@ public class PokemonMainController {
             } catch (PokemonIntrouvableException e) {
                 Platform.runLater(() -> {
                     view.messageErreur.setText("Erreur 404: " + e.getMessage());
+                    clearPokemonDetails();
+                });
+
+            } catch (ApiErreurException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur API: " + e.getMessage());
+                    clearPokemonDetails();
+                });
+
+            } catch (ApiConnexionException e) {
+                Platform.runLater(() -> {
+                    view.messageErreur.setText("Erreur de connexion: " + e.getMessage());
                     clearPokemonDetails();
                 });
 
