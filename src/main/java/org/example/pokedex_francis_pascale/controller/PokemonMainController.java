@@ -11,6 +11,7 @@ import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableExceptio
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
+import org.example.pokedex_francis_pascale.utils.ConfirmationBox;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
 
@@ -145,6 +146,9 @@ public class PokemonMainController {
         if (pokemonTrouverListe == null) {
             return;
         }
+        if (!new ConfirmationBox().boite("Capturer ce Pokémon?", "Confirmation")) {
+            return;
+        }
         try {
             dao.sauvegarder(pokemonTrouverListe);
             refreshList();
@@ -168,6 +172,9 @@ public class PokemonMainController {
             }
         }
         if (selectionList == null) {
+            return;
+        }
+        if (!new ConfirmationBox().boite("Voulez vous vraiment relacher ce Pokémon ?", "Confirmation")) {
             return;
         }
         try{

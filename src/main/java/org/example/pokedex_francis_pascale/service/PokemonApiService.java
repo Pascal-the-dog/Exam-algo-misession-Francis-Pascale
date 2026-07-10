@@ -7,14 +7,14 @@ import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
 import org.example.pokedex_francis_pascale.exceptions.ApiTimeoutException;
 import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
+import org.example.pokedex_francis_pascale.utils.Types;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+
 
 public class PokemonApiService {
 
@@ -53,9 +53,9 @@ public class PokemonApiService {
             p.nom = pokemon.get("name").asText();
 
             JsonNode types = pokemon.get("types");
-            p.type = types.get(0).get("type").get("name").asText();
+            p.type = Types.TYPES.get(pokemon.get("types").get(0).get("type").get("name").asText());
             if (types.size() > 1) {
-                p.type2 = types.get(1).get("type").get("name").asText();
+                p.type2 = Types.TYPES.get(types.get(1).get("type").get("name").asText());
             }
 
             JsonNode stats = pokemon.get("stats");

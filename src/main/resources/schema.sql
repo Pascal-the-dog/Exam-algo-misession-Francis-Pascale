@@ -12,5 +12,5 @@ DROP TABLE IF EXISTS pokemon ;
     defense_speciale INT,
     vitesse INT,
     image_url TEXT,
-    capture_le TIMESTAMP DEFAULT NOW ()
+    capture_le TIMESTAMP DEFAULT NOW (),
 );
