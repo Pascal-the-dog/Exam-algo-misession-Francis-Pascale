@@ -2,6 +2,8 @@ package org.example.pokedex_francis_pascale.controller;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
 import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
 import org.example.pokedex_francis_pascale.exceptions.ApiTimeoutException;
@@ -18,8 +20,8 @@ public class PokemonMainController {
     private final PokemonDAO dao = new PokemonDAO();
     private final PokemonApiService service = new PokemonApiService();
     private final PokemonViewFX view;
-
     private Pokemon pokemonTrouverListe = null;
+    private javafx.scene.media.MediaPlayer mediaPlayer;
 
     public PokemonMainController(PokemonViewFX view) {
         this.view = view;
@@ -28,17 +30,67 @@ public class PokemonMainController {
         view.bouttonRelacher.setOnAction(e -> relacherPokemon());
         view.listePokemon.getSelectionModel().selectedItemProperty()
                 .addListener((obs, ancien, nouveau) -> {
+                    pokemonTrouverListe = nouveau;
                     afficherPokemonDetails(nouveau);
                     if (nouveau != null) {
                         view.bouttonCapturer.setDisable(true);
                         view.bouttonRelacher.setDisable(false);
+
+                        jouerPokemonCri();
                     }
                 });
+    }
+
+    private void jouerPokemonCri() {
+        Pokemon actif = pokemonTrouverListe;
+        if (actif == null) {
+            actif = view.listePokemon.getSelectionModel().getSelectedItem();
+        }
+
+        if (actif != null && actif.cry_url != null && !actif.cry_url.isEmpty()) {
+            try {
+                if (mediaPlayer != null) {
+                    mediaPlayer.stop();
+                    mediaPlayer.dispose();
+                }
+
+                view.messageErreur.setText("");
+
+                String audioUrl = actif.cry_url.trim();
+                java.net.URL url = new java.net.URL(audioUrl);
+
+                java.io.File tempFile = java.io.File.createTempFile("pokemon_cry_", ".mp3");
+                tempFile.deleteOnExit();
+
+                try (java.io.InputStream in = url.openStream();
+                     java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, bytesRead);
+                    }
+                }
+
+                javafx.scene.media.Media audioFile = new javafx.scene.media.Media(tempFile.toURI().toString());
+                mediaPlayer = new javafx.scene.media.MediaPlayer(audioFile);
+
+                mediaPlayer.setOnReady(() -> mediaPlayer.play());
+
+                mediaPlayer.setOnError(() -> {
+                    view.messageErreur.setText("Erreur Audio: " + mediaPlayer.getError().getMessage());
+                });
+
+            } catch (Exception ex) {
+                view.messageErreur.setText("Impossible de charger le cri: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
     }
 
     public void chargerDepuisApi() {
         String recherche = view.champRecherche.getText();
         view.messageErreur.setText("");
+        view.listePokemon.getSelectionModel().clearSelection();
         pokemonTrouverListe = null;
         view.bouttonCapturer.setDisable(true);
 
@@ -215,6 +267,9 @@ public class PokemonMainController {
         view.barVitesse.setProgress(0.0);
 
         view.imagePokemon.setImage(null);
+
+        view.bouttonRelacher.setDisable(true);
+
     }
 
     public void refreshList() {

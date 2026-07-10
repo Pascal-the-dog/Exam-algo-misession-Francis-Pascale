@@ -13,8 +13,8 @@ public class PokemonDAO {
     public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
-                        + "(id, nom, type, type_2, hp, attaque, attaque_speciale, defense, defense_speciale, vitesse, image_url) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                        + "(id, nom, type, type_2, hp, attaque, attaque_speciale, defense, defense_speciale, vitesse, image_url, cry_url) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
                         + "ON CONFLICT (id) DO UPDATE SET "
                         + "nom = EXCLUDED.nom, "
                         + "type = EXCLUDED.type, "
@@ -25,7 +25,8 @@ public class PokemonDAO {
                         + "defense = EXCLUDED.defense, "
                         + "defense_speciale = EXCLUDED.defense_speciale, "
                         + "vitesse = EXCLUDED.vitesse, "
-                        + "image_url = EXCLUDED.image_url";
+                        + "image_url = EXCLUDED.image_url, "
+                        + "cry_url = EXCLUDED.cry_url";
 
         try (Connection connect = Connexion.getConnexion();
              PreparedStatement pre = connect.prepareStatement(sql)) {
@@ -41,6 +42,7 @@ public class PokemonDAO {
             pre.setInt(9, pokemon.defenseSp); // defense_speciale
             pre.setInt(10, pokemon.vitesse);
             pre.setString(11, pokemon.image_url);
+            pre.setString(12, pokemon.cry_url);
 
             pre.executeUpdate();
         } catch (SQLException e) {
@@ -70,6 +72,7 @@ public class PokemonDAO {
                 pokemon.defenseSp = rs.getInt("defense_speciale");
                 pokemon.vitesse = rs.getInt("vitesse");
                 pokemon.image_url = rs.getString("image_url");
+                pokemon.cry_url = rs.getString("cry_url");
 
                 tousEnsemble.add(pokemon);
             }

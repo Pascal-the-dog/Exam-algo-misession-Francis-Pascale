@@ -12,6 +12,7 @@ public class Pokemon {
     public int defenseSp;
     public int vitesse;
     public String image_url;
+    public String cry_url;
 
     public Pokemon(){}
     @Override
