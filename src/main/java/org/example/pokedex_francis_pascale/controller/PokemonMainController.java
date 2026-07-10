@@ -1,10 +1,6 @@
 package org.example.pokedex_francis_pascale.controller;
 
 import javafx.scene.control.Label;
-import javafx.application.Platform;
-import org.example.pokedex_francis_pascale.exceptions.ApiConnexionException;
-import org.example.pokedex_francis_pascale.exceptions.ApiErreurException;
-import org.example.pokedex_francis_pascale.exceptions.PokemonIntrouvableException;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
@@ -43,43 +39,19 @@ public class PokemonMainController {
             return;
         }
 
+        try {
+            Pokemon pokemon = service.recuperer(recherche.trim());
+            pokemonTrouverListe = pokemon;
+            afficherPokemonDetails(pokemon);
+            view.bouttonCapturer.setDisable(false);
+            // dao.sauvegarder(pokemon);
+            // refreshList();
 
-        new Thread(() -> {
-            try {
-                Pokemon pokemon = service.recuperer(recherche.trim());
-                pokemonTrouverListe = pokemon;
-
-                Platform.runLater(() -> {
-                    afficherPokemonDetails(pokemon);
-                    view.bouttonCapturer.setDisable(false);
-                });
-
-            } catch (PokemonIntrouvableException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur 404: " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiErreurException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur API: " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (ApiConnexionException e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Erreur de connexion: " + e.getMessage());
-                    clearPokemonDetails();
-                });
-
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
-                    clearPokemonDetails();
-                });
-            }
-        }).start();
-
+            // view.listePokemon.getSelectionModel().select(pokemon);
+        } catch (Exception e) {
+            view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
+            clearPokemonDetails();
+        }
     }
     public void capturerPokemon() {
         if (pokemonTrouverListe == null) {
