@@ -14,6 +14,7 @@ import org.example.pokedex_francis_pascale.utils.MessageUtils;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,10 @@ public class PokemonMainController {
     private final PokemonViewFX view;
     private Pokemon pokemonTrouverListe = null;
     private javafx.scene.media.MediaPlayer mediaPlayer;
+    private List<Pokemon> pokemonListe = new ArrayList<>();
 
     public PokemonMainController(PokemonViewFX view) {
+
         this.view = view;
         view.bouttonRecherche.setOnAction(e -> gererRecherche());
         view.bouttonCapturer.setOnAction(e -> capturerPokemon());
@@ -57,7 +60,9 @@ public class PokemonMainController {
                 view.montrerChampTexte();
             }
             }
+    }
 
+    public void construireCombo(){
 
     }
 
@@ -151,7 +156,6 @@ public class PokemonMainController {
         view.bouttonCapturer.setDisable(true);
 
         if (recherche == null || recherche.trim().isEmpty()) {
-            refreshList();
             clearPokemonDetails();
             view.bouttonRelacher.setDisable(true);
             return;
@@ -283,7 +287,7 @@ public class PokemonMainController {
             try {
                 dao.sauvegarder(pokemonTrouverListe);
                 Platform.runLater(() -> {
-                    refreshList();
+                    raffraichirListe();
                     view.listePokemon.getSelectionModel().select(pokemonTrouverListe);
                     view.bouttonCapturer.setDisable(true);
                     view.champRecherche.clear();
@@ -320,7 +324,7 @@ public class PokemonMainController {
             try{
                 dao.relacherPokemon(selectionFinal.id);
                 Platform.runLater(() -> {
-                    refreshList();
+                    raffraichirListe();
                     view.bouttonRelacher.setDisable(true);
                     pokemonTrouverListe = null;
                     MessageUtils.effacerMessage(view.messageErreur);;
@@ -417,23 +421,25 @@ public class PokemonMainController {
 
     }
 
-    public void refreshList() {
-        new Thread(() -> {
-            try {
-                List<Pokemon> liste = dao.lister();
-                Platform.runLater(() -> {
-                    view.listePokemon.getItems().setAll(liste);
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    MessageUtils.afficherMessage(view.messageErreur, "Erreur dans la base de données : " + e.getMessage());
-                });
-            }
-        }).start();
+
+    public void rechargerPokemonListe(){
+
     }
 
+
+    public void raffraichirListe() {
+        try {
+            pokemonListe = dao.lister();
+        } catch (Exception e) {
+            MessageUtils.afficherMessage(view.messageErreur, "Erreur dans la base de données : " + e.getMessage());
+        }
+        view.listePokemon.getItems().setAll(pokemonListe);
+    }
+
+
+
     public void demarrer() {
-        refreshList();
+        raffraichirListe();
         MessageUtils.effacerMessage(view.messageErreur);
         view.montrerChampTexte();
     }
