@@ -88,8 +88,8 @@ public class PokemonApiService {
 
             p.image_url = pokemon.get("sprites").get("front_default").asText();
 
-            String cleanName = p.nom.toLowerCase().trim();
-            p.cry_url = "https://play.pokemonshowdown.com/audio/cries/" + cleanName + ".mp3";
+            String NomDeCri = p.nom.toLowerCase().trim();
+            p.cry_url = "https://play.pokemonshowdown.com/audio/cries/" + NomDeCri + ".mp3";
 
             cache.put(search, p); // insere dans le cache
             cache.put(String.valueOf(p.id), p); //insere dans le cache par ID aussi

@@ -52,7 +52,7 @@ public class PokemonViewFX {
         // Bar et bouton de recherche
         Label lblRecherchePar = new Label("Recherche Par : ");
         SelecteurOption = new ComboBox<>();
-        SelecteurOption.getItems().addAll("ID / Nom", "Type");
+        SelecteurOption.getItems().addAll("ID / Nom", "Type", "Génération");
         SelecteurOption.setValue("ID / Nom");
         SelecteurOption.setPrefWidth(120);
 

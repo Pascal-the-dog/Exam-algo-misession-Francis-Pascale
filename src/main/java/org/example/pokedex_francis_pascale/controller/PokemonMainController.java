@@ -13,6 +13,7 @@ import org.example.pokedex_francis_pascale.view.PokemonViewFX;
 import javafx.scene.image.Image;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PokemonMainController {
 
@@ -24,7 +25,7 @@ public class PokemonMainController {
 
     public PokemonMainController(PokemonViewFX view) {
         this.view = view;
-        view.bouttonRecherche.setOnAction(e -> chargerDepuisApi());
+        view.bouttonRecherche.setOnAction(e -> gererRecherche());
         view.bouttonCapturer.setOnAction(e -> capturerPokemon());
         view.bouttonRelacher.setOnAction(e -> relacherPokemon());
         view.listePokemon.getSelectionModel().selectedItemProperty()
@@ -45,45 +46,170 @@ public class PokemonMainController {
         if (actif == null) {
             actif = view.listePokemon.getSelectionModel().getSelectedItem();
         }
-        final Pokemon actifFinal = actif;
-        if (actifFinal != null && actifFinal.cry_url != null && !actifFinal.cry_url.isEmpty()) {
-            new Thread(() -> {
-                try {
-                    if (mediaPlayer != null) {
-                        mediaPlayer.stop();
-                        mediaPlayer.dispose();
-                    }
 
-                    view.messageErreur.setText("");
+        if (actif == null || actif.cry_url == null || actif.cry_url.trim().isEmpty()) {
+            Platform.runLater(() -> {
+                view.messageErreur.setText("Ce Pokémon n'a pas de cri disponible.");
+            });
+            return;
+        }
 
-                    String audioUrl = actifFinal.cry_url.trim();
-                    java.net.URL url = new java.net.URL(audioUrl);
-                    java.io.File tempFile = java.io.File.createTempFile("pokemon_cry_", ".mp3");
-                    tempFile.deleteOnExit();
+        final String audioUrl = actif.cry_url.trim();
 
-                    try (java.io.InputStream in = url.openStream();
-                         java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = in.read(buffer)) != -1) {
-                            out.write(buffer, 0, bytesRead);
+        new Thread(() -> {
+            try {
+                if (mediaPlayer != null) {
+                    try {
+                        MediaPlayer.Status status = mediaPlayer.getStatus();
+                        if (status == MediaPlayer.Status.READY ||
+                                status == MediaPlayer.Status.PLAYING ||
+                                status == MediaPlayer.Status.PAUSED ||
+                                status == MediaPlayer.Status.STOPPED) {
+                            mediaPlayer.stop();
                         }
+                    } catch (Exception ignored) {
+                    }
+                    mediaPlayer.dispose();
+                }
+
+                Platform.runLater(() -> view.messageErreur.setText(""));
+
+                java.net.URL url = new java.net.URL(audioUrl);
+                java.io.File tempFile = java.io.File.createTempFile("pokemon_cry_", ".mp3");
+                tempFile.deleteOnExit();
+
+                try (java.io.InputStream in = url.openStream();
+                     java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, bytesRead);
                     }
 
+                if (tempFile.length() == 0) {
                     Platform.runLater(() -> {
+                        view.messageErreur.setText("Ce Pokémon n'a pas de cri disponible.");
+                    });
+                    return;
+                }
+
+                Platform.runLater(() -> {
+                    try {
                         Media audioFile = new Media(tempFile.toURI().toString());
                         mediaPlayer = new MediaPlayer(audioFile);
-                        mediaPlayer.setOnReady(() -> mediaPlayer.play());
-                        mediaPlayer.setOnError(()->{
-                            view.messageErreur.setText("Erreur Audio: " + mediaPlayer.getError());
-                        });
-                    });
+                        mediaPlayer.setVolume(0.2);
 
-                } catch (Exception ex) {
+                        mediaPlayer.setOnReady(() -> mediaPlayer.play());
+
+                        mediaPlayer.setOnError(() -> {
+                            Throwable err = mediaPlayer.getError();
+                            String msg = (err != null ? err.getMessage() : "Erreur audio inconnue");
+                            view.messageErreur.setText("Erreur Audio: " + msg);
+                        });
+                    } catch (Exception e) {
+                        view.messageErreur.setText("Erreur Audio: " + e.getMessage());
+                    }
+                });
+
+            } catch (Exception ex) {
+                Platform.runLater(() -> {
                     view.messageErreur.setText("Impossible de charger le cri: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-            }).start();
+                });
+                ex.printStackTrace();
+            }
+        }).start();
+    }
+
+
+    public void gererRecherche() {
+        String option = view.SelecteurOption.getValue();
+        String recherche = view.champRecherche.getText();
+        view.messageErreur.setText("");
+
+        view.bouttonCapturer.setDisable(true);
+
+        if (recherche == null || recherche.trim().isEmpty()) {
+            refreshList();
+            clearPokemonDetails();
+            view.bouttonRelacher.setDisable(true);
+            return;
+        }
+
+        if ("Type".equals(option)) {
+            filtrerInventaireParType(recherche.trim().toLowerCase());
+        } else if ("Génération".equals(option)) {
+            filtrerInventaireParGeneration(recherche.trim());
+        } else {
+            chargerDepuisApi();
+        }
+    }
+
+    private void filtrerInventaireParGeneration(String texteGen) {
+        int gen;
+        try {
+            gen = Integer.parseInt(texteGen);
+        } catch (NumberFormatException e) {
+            view.messageErreur.setText("Veuillez entrer un nombre valide (ex: 1 pour Gen 1).");
+            return;
+        }
+        int minId = 0;
+        int maxId = 0;
+
+        switch (gen) {
+            case 1 -> { minId = 1;    maxId = 151;  }
+            case 2 -> { minId = 152;  maxId = 251;  }
+            case 3 -> { minId = 252;  maxId = 386;  }
+            case 4 -> { minId = 387;  maxId = 493;  }
+            case 5 -> { minId = 494;  maxId = 649;  }
+            case 6 -> { minId = 650;  maxId = 721;  }
+            case 7 -> { minId = 722;  maxId = 809;  }
+            case 8 -> { minId = 810;  maxId = 905;  }
+            case 9 -> { minId = 906;  maxId = 1025; }
+            default -> {
+                view.messageErreur.setText("Génération " + gen + " non supportée (Choisissez de 1 à 9).");
+                return;
+            }
+        }
+
+        try {
+            List<Pokemon> tousLesPokemon = dao.lister();
+            final int startRange = minId;
+            final int endRange = maxId;
+            List<Pokemon> filtrer = tousLesPokemon.stream()
+                    .filter(p -> p.id >= startRange && p.id <= endRange)
+                    .collect(Collectors.toList());
+
+            if (filtrer.isEmpty()) {
+                view.messageErreur.setText("Aucun Pokémon de la Génération " + gen + " dans votre inventaire.");
+            }
+
+            view.listePokemon.getItems().setAll(filtrer);
+            clearPokemonDetails();
+            view.bouttonRelacher.setDisable(true);
+
+        } catch (Exception e) {
+            view.messageErreur.setText("Erreur lors du filtrage par génération : " + e.getMessage());
+        }
+    }
+
+    private void filtrerInventaireParType(String typeRecherche) {
+        try {
+            List<Pokemon> tousLesPokemon = dao.lister();
+
+            List<Pokemon> filtrer = tousLesPokemon.stream()
+                    .filter(p -> (p.type != null && p.type.toLowerCase().contains(typeRecherche)) ||
+                            (p.type2 != null && p.type2.toLowerCase().contains(typeRecherche)))
+                    .collect(Collectors.toList());
+
+            if (filtrer.isEmpty()) {
+                view.messageErreur.setText("Aucun Pokémon de type '" + typeRecherche + "' dans votre inventaire.");
+            }
+            view.listePokemon.getItems().setAll(filtrer);
+            clearPokemonDetails();
+            view.bouttonRelacher.setDisable(true);
+
+        } catch (Exception e) {
+            view.messageErreur.setText("Erreur lors du filtrage par type : " + e.getMessage());
         }
     }
 
