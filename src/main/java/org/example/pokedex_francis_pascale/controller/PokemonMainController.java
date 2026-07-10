@@ -19,11 +19,13 @@ public class PokemonMainController {
         this.view = view;
         view.bouttonRecherche.setOnAction(e -> chargerDepuisApi());
         view.bouttonCapturer.setOnAction(e -> capturerPokemon());
+        view.bouttonRelacher.setOnAction(e -> relacherPokemon());
         view.listePokemon.getSelectionModel().selectedItemProperty()
                 .addListener((obs, ancien, nouveau) -> {
                     afficherPokemonDetails(nouveau);
                     if (nouveau != null) {
                         view.bouttonCapturer.setDisable(true);
+                        view.bouttonRelacher.setDisable(false);
                     }
                 });
     }
@@ -43,11 +45,7 @@ public class PokemonMainController {
             Pokemon pokemon = service.recuperer(recherche.trim());
             pokemonTrouverListe = pokemon;
             afficherPokemonDetails(pokemon);
-            view.bouttonCapturer.setDisable(false);
-            // dao.sauvegarder(pokemon);
-            // refreshList();
 
-            // view.listePokemon.getSelectionModel().select(pokemon);
         } catch (Exception e) {
             view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
             clearPokemonDetails();
@@ -66,6 +64,25 @@ public class PokemonMainController {
         } catch (Exception e) {
             view.messageErreur.setText("Pokémon introuvable ou erreur d'API : " + e.getMessage());
         }
+    }
+
+    public void relacherPokemon() {
+        Pokemon selectionList = view.listePokemon.getSelectionModel().getSelectedItem();
+
+        if (selectionList == null && pokemonTrouverListe != null) {
+            for (Pokemon pokemonLister : view.listePokemon.getItems()) {
+                if (pokemonLister.id == pokemonTrouverListe.id) {
+                    selectionList = pokemonLister;
+                    break;
+                }
+            }
+        }
+
+
+        if (selectionList == null) {
+            return;
+        }
+        // TODO: HADLE ERROR FOR RELEASING POKEMON BUTTON FROM DATABASE
     }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
@@ -105,6 +122,21 @@ public class PokemonMainController {
         view.barDefenseSp.setProgress(pokemon.defenseSp / 255.0);
         view.barVitesse.setProgress(pokemon.vitesse / 255.0);
 
+        boolean dejaCapturer = false;
+        for (Pokemon pokemoncapturer : view.listePokemon.getItems()) {
+            if (pokemoncapturer.id == pokemon.id) {
+                dejaCapturer = true;
+                break;
+            }
+        }
+        if (dejaCapturer) {
+            view.bouttonCapturer.setDisable(true);
+            view.bouttonRelacher.setDisable(false);
+        } else {
+            view.bouttonCapturer.setDisable(false);
+            view.bouttonRelacher.setDisable(true);
+        }
+
         if (pokemon.image_url != null && !pokemon.image_url.isEmpty()) {
             Image img = new Image(pokemon.image_url, true);
             view.imagePokemon.setImage(img);
@@ -131,6 +163,9 @@ public class PokemonMainController {
         view.barVitesse.setProgress(0.0);
 
         view.imagePokemon.setImage(null);
+
+        view.bouttonRelacher.setDisable(true);
+
     }
 
     public void refreshList() {
