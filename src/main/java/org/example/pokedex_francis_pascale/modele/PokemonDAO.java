@@ -1,5 +1,6 @@
 package org.example.pokedex_francis_pascale.modele;
 
+import org.example.pokedex_francis_pascale.exceptions.BaseDeDonneesException;
 import org.example.pokedex_francis_pascale.utils.Connexion;
 
 import java.sql.*;
@@ -42,6 +43,8 @@ public class PokemonDAO {
             pre.setString(11, pokemon.image_url);
 
             pre.executeUpdate();
+        } catch (SQLException e) {
+            throw new BaseDeDonneesException("Erreur lors de la sauvegarde du Pokémon", e);
         }
     }
 
@@ -70,6 +73,8 @@ public class PokemonDAO {
 
                 tousEnsemble.add(pokemon);
             }
+        } catch (SQLException e) {
+            throw new BaseDeDonneesException("Erreur lors du chargement des Pokémons", e);
         }
 
         return tousEnsemble;
@@ -79,8 +84,10 @@ public class PokemonDAO {
 
         try (Connection connect = Connexion.getConnexion();
              PreparedStatement pre = connect.prepareStatement(sql)) {
-            pre.setInt(1, id);
-            pre.executeUpdate();
+                pre.setInt(1, id);
+                pre.executeUpdate();
+        }  catch (SQLException e) {
+            throw new BaseDeDonneesException("Erreur lors du relachement du Pokémon", e);
         }
     }
 }
