@@ -1,6 +1,7 @@
 package org.example.pokedex_francis_pascale.view;
 
 import org.example.pokedex_francis_pascale.modele.Pokemon;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -190,6 +191,3 @@ public class PokemonViewFX {
         return racine;
     }
 }
-
-
-// TODO: Ajouter un bouton pour relacher un pokemon dans la liste en dessous de cette liste
