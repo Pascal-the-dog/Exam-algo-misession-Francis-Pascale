@@ -14,6 +14,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class PokemonApiService {
@@ -21,11 +23,18 @@ public class PokemonApiService {
     private static final String URL = "https://pokeapi.co/api/v2/pokemon/";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Map<String, Pokemon> cache = new HashMap<>(); //Cache local -> string: parce quon peut chercher par nom ou id
 
     public Pokemon recuperer(String search) throws Exception{
 
+        search = search.toLowerCase().trim();
+
+        if(cache.containsKey(search)){ // cherche si le pokemon est dans le cache
+            return cache.get(search);
+        }
+
         try {
-            HttpRequest req = HttpRequest.newBuilder(URI.create(URL + search.toLowerCase()))
+            HttpRequest req = HttpRequest.newBuilder(URI.create(URL + search))
                     .timeout(java.time.Duration.ofSeconds(5))
                     .GET()
                     .build();
@@ -71,7 +80,9 @@ public class PokemonApiService {
             String cleanName = p.nom.toLowerCase().trim();
             p.cry_url = "https://play.pokemonshowdown.com/audio/cries/" + cleanName + ".mp3";
 
-
+            cache.put(search, p); // insere dans le cache
+            cache.put(String.valueOf(p.id), p); //insere dans le cache par ID aussi
+            cache.put(p.nom.toLowerCase(), p);
             return p;
 
         } catch (java.net.http.HttpTimeoutException e) {
@@ -80,10 +91,5 @@ public class PokemonApiService {
         } catch (IOException e){
             throw new ApiConnexionException();
         }
-
-
-
-
-
     }
 }
