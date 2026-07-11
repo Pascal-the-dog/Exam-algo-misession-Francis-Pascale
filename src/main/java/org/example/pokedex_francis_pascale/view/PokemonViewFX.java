@@ -1,5 +1,8 @@
 package org.example.pokedex_francis_pascale.view;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.scene.image.Image;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 
 import javafx.geometry.Insets;
@@ -18,14 +21,15 @@ public class PokemonViewFX {
     public final Button bouttonRecherche;
     public final Button bouttonCapturer;
     public final Button bouttonRelacher;
+    public final Button bouttonFavori;
     public final Label lblPokemonIdNom;
     public final Label valleurHp, valleurAttack, valleurAttackSp, valleurDefense, valleurDefenseSp, valleurVitesse;
     public final ProgressBar barHp, barAttack, barAttackSp, barDefense, barDefenseSp, barVitesse;
     public final ImageView imagePokemon;
     public final ListView<Pokemon> listePokemon;
     public final Label messageErreur;
+    public final Label nombrePokemons;
     public final HBox conteneurTypes;
-
     private final BorderPane racine;
 
     // Bar de stats
@@ -61,6 +65,9 @@ public class PokemonViewFX {
         grid.add(labelValeur, 1, ligne);
         grid.add(bar, 2, ligne);
         GridPane.setHgrow(bar, Priority.ALWAYS);
+
+
+        GridPane.setHgrow(bar, Priority.ALWAYS);
     }
 
     public PokemonViewFX() {
@@ -68,11 +75,12 @@ public class PokemonViewFX {
         // Bar et bouton de recherche
         Label lblRecherchePar = new Label("Recherche Par : ");
         selecteurOption = new ComboBox<>();
-        selecteurOption.getItems().addAll("ID / Nom", "Type", "Génération");
+        selecteurOption.getItems().addAll("ID / Nom", "Favoris", "Type", "Génération");
         selecteurOption.setValue("ID / Nom");
         selecteurOption.setPrefWidth(120);
 
         champRecherche = new TextField();
+
         champRecherche.setPromptText("Trouver un pokemon");
         HBox.setHgrow(champRecherche, Priority.ALWAYS);
 
@@ -82,7 +90,7 @@ public class PokemonViewFX {
 
         bouttonRecherche = new Button("Trouver");
         bouttonRecherche.setStyle("-fx-cursor: hand;");
-
+        champRecherche.setOnAction(e -> bouttonRecherche.fire());
         bouttonCapturer = new Button("Capturer");
         bouttonCapturer.setStyle("-fx-cursor: hand;");
         bouttonCapturer.setDisable(true);
@@ -93,17 +101,30 @@ public class PokemonViewFX {
         bouttonRelacher.setMaxWidth(Double.MAX_VALUE);
         VBox.setMargin(bouttonRelacher, new Insets(5, 0, 0,0));
 
+        bouttonFavori = new Button("☆ Favori");
+        bouttonFavori.setStyle("-fx-cursor: hand;");
+        bouttonFavori.setDisable(true);
+        bouttonFavori.setMaxWidth(Double.MAX_VALUE);
+        VBox.setMargin(bouttonFavori, new Insets(5, 0, 0,0));
+
+
         HBox sectionRecherche = new HBox(10, lblRecherchePar, selecteurOption, champRecherche, comboRecherche, bouttonRecherche, bouttonCapturer);
         sectionRecherche.setAlignment(Pos.TOP_LEFT);
         sectionRecherche.setPadding(new Insets(5, 5, 20, 5));
 
         // image de pokemon, elle devrait etre au centre a gauche
         imagePokemon = new ImageView();
-        imagePokemon.setFitWidth(200);
-        imagePokemon.setFitHeight(200);
         imagePokemon.setPreserveRatio(true);
+        imagePokemon.setSmooth(true);
 
-        StackPane ImagePokemonPlaceholder = new StackPane(imagePokemon);
+        // Barre de chargement
+        ProgressBar barChargementImage = new ProgressBar();
+        barChargementImage.setMaxWidth(Double.MAX_VALUE);
+        barChargementImage.setVisible(false);
+
+        StackPane ImagePokemonPlaceholder = new StackPane();
+        ImagePokemonPlaceholder.getChildren().addAll(imagePokemon, barChargementImage);
+        StackPane.setAlignment(barChargementImage, Pos.CENTER);
         ImagePokemonPlaceholder.setStyle(
                 "-fx-border-color: #facc15;" +
                 "-fx-border-width: 3.5;" +
@@ -113,9 +134,12 @@ public class PokemonViewFX {
                 "-fx-background-insets: 0, 2;" +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 14, 0.3, 0, 4);"
         );
-        ImagePokemonPlaceholder.setPrefSize(200, 200);
-        ImagePokemonPlaceholder.setMinSize(200, 200);
-        ImagePokemonPlaceholder.setAlignment(Pos.CENTER);
+        imagePokemon.fitWidthProperty().bind(ImagePokemonPlaceholder.widthProperty());
+        imagePokemon.fitHeightProperty().bind(ImagePokemonPlaceholder.heightProperty());
+
+        ImagePokemonPlaceholder.setMinSize(0, 0);
+        ImagePokemonPlaceholder.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        HBox.setHgrow(ImagePokemonPlaceholder, Priority.ALWAYS);
 
         // Section de statistiques, elle devrait se trouver au centre
         lblPokemonIdNom = new Label("Aucun Pokemon Selectioner");
@@ -153,19 +177,24 @@ public class PokemonViewFX {
 
         PanneauStats.setHgap(12);
         PanneauStats.setVgap(10);
-        PanneauStats.setAlignment(Pos.CENTER_LEFT);
+
 
         HBox ligneIdentite = new HBox(10);
         ligneIdentite.setAlignment(Pos.CENTER_LEFT);
+
         Region spacerIdentite = new Region();
         HBox.setHgrow(spacerIdentite, Priority.ALWAYS);
+
         ligneIdentite.getChildren().addAll(lblPokemonIdNom, spacerIdentite, conteneurTypes);
+
         VBox PanneauInfoCentral = new VBox(12, ligneIdentite, lblStatsTitre, PanneauStats);
         PanneauInfoCentral.setPadding(new Insets(0, 15, 0, 15));
 
+        VBox.setVgrow(PanneauInfoCentral, Priority.ALWAYS);
+
         // Section de pokemon sauvegarder dans la base de donnee
         VBox PanneauListe = new VBox(5);
-        Label lblListeTitre = new Label("List de vos pokemon");
+        Label lblListeTitre = new Label("Liste de vos Pokemons");
         lblListeTitre.setStyle("-fx-font-weight: bold;");
         listePokemon = new ListView<>();
         listePokemon.setCellFactory(lv -> new ListCell<Pokemon>() {
@@ -179,14 +208,20 @@ public class PokemonViewFX {
                 }
             }
         });
+
+        nombrePokemons = new Label();
+
         VBox.setVgrow(listePokemon, Priority.ALWAYS);
-        PanneauListe.getChildren().addAll(lblListeTitre, listePokemon, bouttonRelacher);
+        PanneauListe.getChildren().addAll(lblListeTitre, listePokemon, bouttonRelacher, bouttonFavori, nombrePokemons);
         PanneauListe.setPrefWidth(250);
         PanneauListe.setMinWidth(220);
 
         //Assemblage principal
         HBox LePokedex = new HBox(10, ImagePokemonPlaceholder, PanneauInfoCentral, PanneauListe);
         HBox.setHgrow(PanneauInfoCentral, Priority.ALWAYS);
+
+        HBox.setHgrow(LePokedex, Priority.ALWAYS);
+        VBox.setVgrow(LePokedex, Priority.ALWAYS);
 
         messageErreur = new Label();
         messageErreur.setStyle("-fx-text-fill: red;");
@@ -212,8 +247,12 @@ public class PokemonViewFX {
         } catch (NullPointerException e) {
             System.err.println("CSS expansion warning: Could not find /styles.css in the resources folder.");
         }
+        Platform.runLater(() -> champRecherche.requestFocus());
+
     }
     public Parent getRoot(){
         return racine;
     }
+
+
 }

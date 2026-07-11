@@ -26,6 +26,7 @@ public class PokemonMainController {
     private Pokemon pokemonTrouverListe = null;
     private javafx.scene.media.MediaPlayer mediaPlayer;
     private List<Pokemon> pokemonListe = new ArrayList<>();
+    private Pokemon pokemonActuel;
 
     public PokemonMainController(PokemonViewFX view) {
 
@@ -33,6 +34,7 @@ public class PokemonMainController {
         view.bouttonRecherche.setOnAction(e -> gererRecherche());
         view.bouttonCapturer.setOnAction(e -> capturerPokemon());
         view.bouttonRelacher.setOnAction(e -> relacherPokemon());
+        view.bouttonFavori.setOnAction(e -> toggleFavori());
         view.listePokemon.getSelectionModel().selectedItemProperty()
                 .addListener((obs, ancien, nouveau) -> {
                     pokemonTrouverListe = nouveau;
@@ -45,26 +47,69 @@ public class PokemonMainController {
                     }
                 });
         view.selecteurOption.setOnAction(this::onOptionChange);
+        view.bouttonFavori.setOnAction(e -> toggleFavori());
     }
+
 
     private void onOptionChange(ActionEvent e) {
         String valeur = view.selecteurOption.getValue();
         switch (valeur) {
             case "Type" -> {
                 view.montrerCombo();
+                view.listePokemon.getItems().setAll(pokemonListe);
+                view.comboRecherche.getSelectionModel().clearSelection();
+                view.comboRecherche.setValue(null);
+                construireCombo(true);
+                view.comboRecherche.setOnAction(choix -> gererRecherche());
             }
             case "Génération" -> {
                 view.montrerCombo();
+                view.listePokemon.getItems().setAll(pokemonListe);  // reaffiche la liste du pokedex
+                view.comboRecherche.getSelectionModel().clearSelection();  // clear les valeurs de la combo
+                view.comboRecherche.setValue(null);
+                construireCombo(false);
+                view.comboRecherche.setOnAction(choix -> gererRecherche());
             }
             case "ID / Nom" -> {
                 view.montrerChampTexte();
+                view.comboRecherche.getSelectionModel().clearSelection();
+                view.comboRecherche.setValue(null);
+                view.listePokemon.getItems().setAll(pokemonListe);
+                view.comboRecherche.setOnAction(choix -> gererRecherche());
             }
+            case "Favoris" -> {
+                view.champRecherche.setVisible(false);
+                view.champRecherche.setManaged(true);
+                view.comboRecherche.setVisible(false);
+                view.comboRecherche.setManaged(false);
+                filtrerFavoris();
+            }
+
+
+
             }
     }
 
-    public void construireCombo(){
+    public void construireCombo(boolean type){
+        if (type){
+            List<String> types = pokemonListe.stream()
+                    .flatMap(p -> {
+                        List<String> t = new ArrayList<>();
+                        if (p.type !=null) t.add(p.type.toLowerCase());
+                        if (p.type2 != null) t.add(p.type2.toLowerCase());
+                        return t.stream();
+                    })
+                    .distinct()
+                    .sorted()
+                    .toList();
+            view.comboRecherche.getItems().setAll(types);
+
+        } else {
+            view.comboRecherche.getItems().setAll(List.of("1","2","3","4","5","6","7","8","9"));
+        }
 
     }
+
 
     private void jouerPokemonCri() {
         Pokemon actif = pokemonTrouverListe;
@@ -150,10 +195,18 @@ public class PokemonMainController {
 
     public void gererRecherche() {
         String option = view.selecteurOption.getValue();
-        String recherche = view.champRecherche.getText();
+
         MessageUtils.effacerMessage(view.messageErreur);;
 
         view.bouttonCapturer.setDisable(true);
+
+        String recherche;
+
+        if ("Type".equals(option) || "Génération".equals(option)) {
+            recherche = view.comboRecherche.getValue();
+        } else {
+            recherche = view.champRecherche.getText();
+        }
 
         if (recherche == null || recherche.trim().isEmpty()) {
             clearPokemonDetails();
@@ -161,19 +214,46 @@ public class PokemonMainController {
             return;
         }
 
+        if ("Favoris".equals(option)) {
+            filtrerFavoris();
+            return;
+        }
+
         if ("Type".equals(option)) {
-            filtrerInventaireParType(recherche.trim().toLowerCase());
+            filtrerInventaireParType(view.comboRecherche.getValue());
         } else if ("Génération".equals(option)) {
             filtrerInventaireParGeneration(recherche.trim());
         } else {
             chargerDepuisApi();
         }
+
+
     }
+
+    private void filtrerFavoris() {
+        List<Pokemon> favoris = pokemonListe.stream()
+                .filter(p -> p.favori)
+                .toList();
+
+        view.listePokemon.getItems().setAll(favoris);
+
+        clearPokemonDetails();
+        view.bouttonRelacher.setDisable(true);
+        view.bouttonFavori.setDisable(true);
+
+        if (favoris.isEmpty()) {
+            MessageUtils.afficherMessage(view.messageErreur, "Aucun Pokémon favori.");
+        } else {
+            MessageUtils.effacerMessage(view.messageErreur);
+        }
+    }
+
+
 
     private void filtrerInventaireParGeneration(String texteGen) {
         int gen;
         try {
-            gen = Integer.parseInt(texteGen);
+            gen = Integer.parseInt(view.comboRecherche.getValue());
         } catch (NumberFormatException e) {
             MessageUtils.afficherMessage(view.messageErreur, "Veuillez entrer un nombre valide (ex: 1 pour Gen 1).");
             return;
@@ -338,6 +418,7 @@ public class PokemonMainController {
     }
 
     public void afficherPokemonDetails(Pokemon pokemon) {
+        pokemonActuel = pokemon;
         if (pokemon == null) {
             clearPokemonDetails();
             return;
@@ -396,36 +477,31 @@ public class PokemonMainController {
             view.bouttonCapturer.setDisable(false);
             view.bouttonRelacher.setDisable(true);
         }
+        view.bouttonFavori.setDisable(false);
+        majAffichageBouttonFavori(pokemon);
+
     }
 
     private void clearPokemonDetails() {
         view.lblPokemonIdNom.setText("Aucun Pokémon Sélectionné");
-
         view.valleurHp.setText("-");
         view.valleurAttack.setText("-");
         view.valleurAttackSp.setText("-");
         view.valleurDefense.setText("-");
         view.valleurDefenseSp.setText("-");
         view.valleurVitesse.setText("-");
-
         view.barHp.setProgress(0.0);
         view.barAttack.setProgress(0.0);
         view.barAttackSp.setProgress(0.0);
         view.barDefense.setProgress(0.0);
         view.barDefenseSp.setProgress(0.0);
         view.barVitesse.setProgress(0.0);
-
         view.imagePokemon.setImage(null);
-
         view.bouttonRelacher.setDisable(true);
+        view.bouttonFavori.setDisable(true);
+        view.bouttonFavori.setText("☆ Favori");
 
     }
-
-
-    public void rechargerPokemonListe(){
-
-    }
-
 
     public void raffraichirListe() {
         try {
@@ -434,13 +510,50 @@ public class PokemonMainController {
             MessageUtils.afficherMessage(view.messageErreur, "Erreur dans la base de données : " + e.getMessage());
         }
         view.listePokemon.getItems().setAll(pokemonListe);
+        view.nombrePokemons.setText("Vous avez capturé "+ pokemonListe.size() + " Pokémons");
     }
-
-
 
     public void demarrer() {
         raffraichirListe();
         MessageUtils.effacerMessage(view.messageErreur);
         view.montrerChampTexte();
+    }
+
+
+    // Aide de copilot
+    private void toggleFavori(){
+        Pokemon cible = pokemonTrouverListe;
+        if (cible == null) {
+            cible =view.listePokemon.getSelectionModel().getSelectedItem();
+        }
+
+        cible.favori = !cible.favori;
+
+        try{
+            dao.sauvegarder(cible);
+        } catch (Exception e){
+            MessageUtils.afficherMessage(view.messageErreur, "Erreur lors de la mise a jour du favori: "+e.getMessage());
+            return;
+        }
+
+        majAffichageBouttonFavori(cible);
+
+        raffraichirListe();
+
+        for (Pokemon pokemon : view.listePokemon.getItems()) {
+            if (pokemon.id == cible.id) {
+                view.listePokemon.getSelectionModel().select(pokemon);
+                break;
+            }
+        }
+    }
+
+    // Aide de copilot
+    private void majAffichageBouttonFavori(Pokemon pokemon) {
+        if (pokemon != null && pokemon.favori) {
+            view.bouttonFavori.setText("* Favori");
+        } else {
+            view.bouttonFavori.setText("- Favori");
+        }
     }
 }

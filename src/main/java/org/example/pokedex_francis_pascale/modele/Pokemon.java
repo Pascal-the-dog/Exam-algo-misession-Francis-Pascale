@@ -17,10 +17,14 @@ public class Pokemon {
     public int vitesse;
     public String image_url;
     public String cry_url;
+    public Boolean favori;
 
     public Pokemon(){}
+
     @Override
     public String toString() {
-        return capitalize(nom) + " · #" + id;
+        String fav = favori ? "*" : "";
+        return fav + " " + capitalize(nom) + " · #" + id;
     }
 }
+
