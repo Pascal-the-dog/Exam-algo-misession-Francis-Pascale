@@ -7,28 +7,45 @@ Dans le cadre de l’examen de mi‑session, nous avons développé un Pokédex 
 
 ## Travail accompli par Pascale
 * DAO : mise en place de la couche d’accès aux données pour la persistance des Pokémon.
+* 
 * Modèle Pokemon : définition de la structure interne et des attributs essentiels.
+* 
 * PokemonViewFX : construction de la vue principale et intégration des éléments nécessaires à l’affichage.
+* 
 * UI + CSS : conception et stylisation complète de l’interface, un travail majeur du projet.
+* 
 * Fonctions de filtrage : ajout des mécanismes permettant de sélectionner les Pokémon selon différents critères.
+* 
 * MainController : contribution importante à la logique centrale et à la coordination des actions.
+* 
 * Corrections et ajouts divers : stabilisation du projet et amélioration continue.
+* 
 * Documentation : rédaction des notes techniques et organisation des informations.
 
 ## Travail accompli par Francis
 * PokemonApiService : développement du service de communication avec l’API et récupération des données externes.
+  
 * Gestion des erreurs : création d’erreurs personnalisées, gestion des timeouts, rate limiting et traitement des cas d’échec.
+  
 * Fonctions utilitaires : ajout d’outils internes (Capitalize, ConfirmationBox, gestion des types, MessageUtils).
+  
 * Conversion des types en français : adaptation des données API au contexte francophone.
+  
 * Système de favoris : ajout d’une fonctionnalité permettant de marquer certains Pokémon.
+  
 * MainController : travail important sur la logique interne et la synchronisation des données.
+  
 * Corrections et ajouts divers : interventions régulières pour stabiliser le projet.
+  
 * Multithreading + cache local : mise en place de threads pour éviter les blocages et ajout d’un cache pour optimiser les performances.
 
 ## Difficultés rencontrées
 * Versions Java différentes : incompatibilités initiales entre les environnements de développement.
+  
 * Problèmes GitHub : pulls incomplets et écrasements accidentels de fichiers lors de push subséquents.
+  
 * Multithreading : mise en place complexe au début, nécessitant plusieurs ajustements.
+  
 * Organisation du code : nécessité de mieux séparer les responsabilités pour éviter un contrôleur trop volumineux.
 
 ## Améliorations possibles avec plus de temps
