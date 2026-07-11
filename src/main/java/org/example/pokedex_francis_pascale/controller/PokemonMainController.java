@@ -9,6 +9,7 @@ import org.example.pokedex_francis_pascale.exceptions.*;
 import org.example.pokedex_francis_pascale.modele.Pokemon;
 import org.example.pokedex_francis_pascale.modele.PokemonDAO;
 import org.example.pokedex_francis_pascale.service.PokemonApiService;
+import org.example.pokedex_francis_pascale.utils.Capitalize;
 import org.example.pokedex_francis_pascale.utils.ConfirmationBox;
 import org.example.pokedex_francis_pascale.utils.MessageUtils;
 import org.example.pokedex_francis_pascale.view.PokemonViewFX;
@@ -444,7 +445,7 @@ public class PokemonMainController {
         }
 
         view.conteneurTypes.getChildren().clear();
-        view.lblPokemonIdNom.setText(pokemon.toString());
+        view.lblPokemonIdNom.setText(Capitalize.capitalize(pokemon.nom));
 
         Label premierType = new Label(pokemon.type.toUpperCase());
         premierType.getStyleClass().addAll("type-badge", "type-" + pokemon.type.toLowerCase().trim());
