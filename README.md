@@ -60,6 +60,10 @@ Lancez l'interface graphique du Pokedex en utilisant la commande appropriée à 
     ```bash
     ./mvnw exec:java -Dexec.mainClass="org.example.pokedex_francis_pascale.MainFX"
     ```
+## 💻 Video de Presentation
+
+[examen-mi-session.webm](https://github.com/user-attachments/assets/478472a2-98f3-4761-b0fe-a6593f37456a)
+
 
 ## 📁 Architecture
 
