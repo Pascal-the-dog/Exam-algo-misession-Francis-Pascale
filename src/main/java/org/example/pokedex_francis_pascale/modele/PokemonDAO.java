@@ -13,8 +13,8 @@ public class PokemonDAO {
     public void sauvegarder(Pokemon pokemon) throws SQLException {
         String sql =
                 "INSERT INTO pokemon "
-                        + "(id, nom, type, type_2, hp, attaque, attaque_speciale, defense, defense_speciale, vitesse, image_url, cry_url) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                        + "(id, nom, type, type_2, hp, attaque, attaque_speciale, defense, defense_speciale, vitesse, image_url, cry_url, favori) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
                         + "ON CONFLICT (id) DO UPDATE SET "
                         + "nom = EXCLUDED.nom, "
                         + "type = EXCLUDED.type, "
@@ -26,7 +26,8 @@ public class PokemonDAO {
                         + "defense_speciale = EXCLUDED.defense_speciale, "
                         + "vitesse = EXCLUDED.vitesse, "
                         + "image_url = EXCLUDED.image_url, "
-                        + "cry_url = EXCLUDED.cry_url";
+                        + "cry_url = EXCLUDED.cry_url, "
+                        + "favori = EXCLUDED.favori";
 
         try (Connection connect = Connexion.getConnexion();
              PreparedStatement pre = connect.prepareStatement(sql)) {
@@ -43,6 +44,7 @@ public class PokemonDAO {
             pre.setInt(10, pokemon.vitesse);
             pre.setString(11, pokemon.image_url);
             pre.setString(12, pokemon.cry_url);
+            pre.setBoolean(13, pokemon.favori);
 
             pre.executeUpdate();
         } catch (SQLException e) {
@@ -73,6 +75,7 @@ public class PokemonDAO {
                 pokemon.vitesse = rs.getInt("vitesse");
                 pokemon.image_url = rs.getString("image_url");
                 pokemon.cry_url = rs.getString("cry_url");
+                pokemon.favori = rs.getBoolean("favori");
 
                 tousEnsemble.add(pokemon);
             }
