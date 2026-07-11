@@ -30,6 +30,7 @@ public class PokemonViewFX {
     public final Label messageErreur;
     public final Label nombrePokemons;
     public final HBox conteneurTypes;
+    public final Button boutonPlayPause;
     private final BorderPane racine;
 
     // Bar de stats
@@ -226,7 +227,19 @@ public class PokemonViewFX {
         messageErreur = new Label();
         messageErreur.setStyle("-fx-text-fill: red;");
 
-        VBox conteneurPrincipal = new VBox(5, LePokedex, messageErreur);
+        boutonPlayPause = new Button("▶️ Play");
+        boutonPlayPause.setStyle("-fx-cursor: hand;");
+
+        Region espaceErreur = new Region();
+        HBox.setHgrow(espaceErreur, Priority.ALWAYS);
+
+        HBox ligneErreurAudio = new HBox(10, messageErreur, espaceErreur, boutonPlayPause);
+        ligneErreurAudio.setAlignment(Pos.CENTER_LEFT);
+
+        VBox conteneurPrincipal = new VBox(5, LePokedex, ligneErreurAudio);
+
+
+
         VBox.setVgrow(conteneurPrincipal, Priority.ALWAYS);
 
 

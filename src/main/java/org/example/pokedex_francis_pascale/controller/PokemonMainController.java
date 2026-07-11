@@ -27,6 +27,8 @@ public class PokemonMainController {
     private javafx.scene.media.MediaPlayer mediaPlayer;
     private List<Pokemon> pokemonListe = new ArrayList<>();
     private Pokemon pokemonActuel;
+    private MediaPlayer bgmPlayer;
+
 
     public PokemonMainController(PokemonViewFX view) {
 
@@ -48,7 +50,24 @@ public class PokemonMainController {
                 });
         view.selecteurOption.setOnAction(this::onOptionChange);
         view.bouttonFavori.setOnAction(e -> toggleFavori());
+        view.boutonPlayPause.setOnAction(e -> toggleBGM());
+
     }
+
+    private void toggleBGM() {
+        if (bgmPlayer == null) return;
+
+        MediaPlayer.Status status = bgmPlayer.getStatus();
+
+        if (status == MediaPlayer.Status.PLAYING) {
+            bgmPlayer.pause();
+            view.boutonPlayPause.setText("▶️ Play");
+        } else {
+            bgmPlayer.play();
+            view.boutonPlayPause.setText("⏸️ Pause");
+        }
+    }
+
 
 
     private void onOptionChange(ActionEvent e) {
@@ -517,7 +536,24 @@ public class PokemonMainController {
         raffraichirListe();
         MessageUtils.effacerMessage(view.messageErreur);
         view.montrerChampTexte();
+        initialiserBGM();
     }
+
+    private void initialiserBGM() {
+        try {
+            Media media = new Media(getClass().getResource("/TitleScreen.mp3").toExternalForm());
+            bgmPlayer = new MediaPlayer(media);
+            bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE); // boucle infinie
+            bgmPlayer.setVolume(0.25);
+
+            bgmPlayer.play();
+            view.boutonPlayPause.setText("⏸️ Pause");
+
+        } catch (Exception e) {
+            MessageUtils.afficherMessage(view.messageErreur, "Erreur BGM : " + e.getMessage());
+        }
+    }
+
 
 
     // Aide de copilot

@@ -12,5 +12,6 @@ public class MessageUtils {
     public static void effacerMessage(Label label) {
         label.setText("");
         label.setVisible(false);
+        label.setManaged(true);
     }
 }
