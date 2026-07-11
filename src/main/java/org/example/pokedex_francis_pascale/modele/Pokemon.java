@@ -17,7 +17,7 @@ public class Pokemon {
     public int vitesse;
     public String image_url;
     public String cry_url;
-    public Boolean favori;
+    public Boolean favori = false;
 
     public Pokemon(){}
 
